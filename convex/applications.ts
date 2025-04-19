@@ -92,3 +92,26 @@ export const listByStudent = query({
       .collect();
   },
 });
+
+export const getById = query({
+  args: { applicationId: v.id("applications") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const application = await ctx.db.get(args.applicationId);
+    if (!application) throw new Error("Application not found");
+
+    // Check if user is admin or the application owner
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+    
+    if (profile?.role !== "admin" && application.studentId !== userId) {
+      throw new Error("Not authorized");
+    }
+
+    return application;
+  },
+});

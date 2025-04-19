@@ -352,5 +352,4 @@ function ProfileView({ profile }: { profile: any }) {
   );
 }
 
-
 export default App;

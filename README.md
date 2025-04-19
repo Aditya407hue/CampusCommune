@@ -1,24 +1,101 @@
-# Initial Backend Setup
-  
-This is a project built with [Chef](https://chef.convex.dev) using [Convex](https://convex.dev) as its backend.
-  
-This project is connected to the Convex deployment named [`standing-egret-120`](https://dashboard.convex.dev/d/standing-egret-120).
-  
-## Project structure
-  
-The frontend code is in the `app` directory and is built with [Vite](https://vitejs.dev/).
-  
-The backend code is in the `convex` directory.
-  
-`npm run dev` will start the frontend and backend servers.
+# Campus Job Portal
 
-## App authentication
+A modern job portal application built with React, TypeScript, Convex, and Tailwind CSS.
 
-Chef apps use [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
+## Tech Stack
 
-## Developing and deploying your app
+- Frontend: React + TypeScript + Vite
+- Backend: Convex (Backend as a Service)
+- Styling: Tailwind CSS + shadcn/ui components
+- Authentication: Convex Auth
 
-Check out the [Convex docs](https://docs.convex.dev/) for more information on how to develop with Convex.
-* If you're new to Convex, the [Overview](https://docs.convex.dev/understanding/) is a good place to start
-* Check out the [Hosting and Deployment](https://docs.convex.dev/production/) docs for how to deploy your app
-* Read the [Best Practices](https://docs.convex.dev/understanding/best-practices/) guide for tips on how to improve you app further
+## Setup Instructions
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Set up environment variables:
+   Create a `.env.local` file with your Convex credentials:
+
+   ```
+   CONVEX_DEPLOYMENT=your_deployment_url
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   This will start both the Convex backend and Vite development server.
+
+## Project Structure
+
+- `/src` - Frontend React application
+
+  - `/components` - Reusable UI components
+  - `/lib` - Utility functions and helpers
+  - `/hooks` - Custom React hooks
+
+- `/convex` - Backend Convex functions and schema
+  - `schema.ts` - Database schema definitions
+  - `users.ts` - User management functions
+  - `jobs.ts` - Job listing functions
+  - `applications.ts` - Job application functions
+
+## Database Models
+
+### Profile
+
+- userId (Id, references users)
+- role (enum: student, admin)
+- name (string)
+- department (string)
+- graduationYear (number)
+- skills (array of strings)
+- resumeFileId (optional, Id references _storage)
+
+### Job
+
+- title (string)
+- company (string)
+- description (string)
+- location (string)
+- type (enum: full-time, internship, part-time)
+- skills (array of strings)
+- salary (optional, number)
+- deadline (number, Unix timestamp)
+- isActive (boolean)
+- createdBy (Id, references users)
+
+### Application
+
+- jobId (Id, references jobs)
+- studentId (Id, references users)
+- status (enum: pending, shortlisted, rejected, accepted)
+- appliedAt (number, Unix timestamp)
+- resumeFileId (Id, references _storage)
+
+### Notification
+
+- userId (Id, references users)
+- type (enum: new_job, status_update, deadline_reminder)
+- message (string)
+- read (boolean)
+- createdAt (number, Unix timestamp)
+
+## Features
+
+- User authentication and role-based access
+- Job posting and management
+- Job application submission and tracking
+- Resume upload and management
+- Real-time updates using Convex's live queries
+- Responsive design with Tailwind CSS
+
+## Development
+
+- Run frontend only: `npm run dev:frontend`
+- Run backend only: `npm run dev:backend`
+- Run type checking: `npm run lint`

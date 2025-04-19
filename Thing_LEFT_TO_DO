@@ -1,0 +1,72 @@
+# Campus Job Portal - Development Tasks
+
+## Completed Features ✅
+
+- TypeScript migration for backend
+- Tailwind CSS integration
+- Real-time updates with Convex live queries
+- User authentication with role-based access
+- Basic job posting and management
+- Resume upload functionality
+- Improve form validation with react-hook-form
+
+## Stack Improvements
+
+1. Backend Enhancement
+
+   - Optimize Convex functions for better performance
+   - Implement comprehensive error handling
+
+2. Frontend Modernization
+   - Enhance component reusability
+   - Implement better state management
+   - shadcn/ui component library implementation
+
+## Features To Implement
+
+- Edit profile functionality - backend route + frontend
+- Search feature implementation
+- MyJobs filter addition
+
+### 1. Notification System
+
+- Implement response success messages across all pages
+- Add WhatsApp notification integration
+- Implement calendar notifications for deadline reminders
+
+### 2. Application Management
+
+- Add detailed view for recent applications
+  - Endpoint: /applications/:id - show details in model view
+- Implement application status tracking (selected/rejected)
+- Integrate CSV processing for selected candidates
+- Add automated notification system for selection results
+
+### 3. User Profile Enhancement
+
+- Update user model to include:
+  - First name and last name
+  - Date of birth
+  - Interests/preferences
+  - Role preferences
+- Implement profile editing in user dashboard
+
+### 4. Job Management
+
+- Add job status - Drafted if PR has not yet approved the application
+- Add job sorting based on deadlines
+- Implement job interest marking system
+- Add role-based job filtering
+
+### 5. Resume Analysis
+
+- Implement AI-based resume review system
+- Add ATS score prediction
+- Provide improvement suggestions
+
+### 6. PR Integration
+
+- Develop email parsing for job details
+- Create Excel export functionality
+- Implement PR approval workflow
+- Add pending status for unapproved jobs
