@@ -34,10 +34,13 @@ export const getProfile = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    return await ctx.db
+    const user = await ctx.db
       .query("profiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
+
+      if(!user) return null;
+    return user;
   },
 });
 

@@ -31,10 +31,10 @@ export function Dashboard() {
           Explore hundreds of job opportunities and take the next step in your career journey.
         </p>
         <div className="flex justify-center gap-4">
-          <button className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+          <button className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-all duration-200 hover:scale-105 hover:shadow-md">
             Browse Jobs
           </button>
-          <button className="border border-indigo-600 text-indigo-600 px-6 py-2 rounded-md hover:bg-indigo-50 transition-colors">
+          <button className="border border-indigo-600 text-indigo-600 px-6 py-2 rounded-md hover:bg-indigo-100 transition-all duration-200 hover:scale-105 hover:shadow-sm">
             For Employers
           </button>
         </div>
@@ -44,20 +44,20 @@ export function Dashboard() {
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Job Categories</h2>
-          <a href="#" className="text-indigo-600 hover:underline">View All</a>
+          <a href="#" className="text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">View All</a>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-blue-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-blue-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer transform hover:-translate-y-1">
             <h3 className="text-xl font-semibold mb-2 capitalize">Full-Time Jobs</h3>
             <p className="text-gray-600 mb-4">{jobCategories["full-time"].length} positions available</p>
             <a href="#" className="text-blue-600 hover:underline">Browse Jobs →</a>
           </div>
-          <div className="bg-green-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-green-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer transform hover:-translate-y-1">
             <h3 className="text-xl font-semibold mb-2 capitalize">Part-Time Jobs</h3>
             <p className="text-gray-600 mb-4">{jobCategories["part-time"].length} positions available</p>
             <a href="#" className="text-green-600 hover:underline">Browse Jobs →</a>
           </div>
-          <div className="bg-amber-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-amber-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer transform hover:-translate-y-1">
             <h3 className="text-xl font-semibold mb-2 capitalize">Internships</h3>
             <p className="text-gray-600 mb-4">{jobCategories["internship"].length} positions available</p>
             <a href="#" className="text-amber-600 hover:underline">Browse Jobs →</a>
@@ -82,11 +82,11 @@ export function Dashboard() {
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Latest Job Posts</h2>
-          <a href="#" className="text-indigo-600 hover:underline">View All</a>
+          <a href="#" className="text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">View All</a>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {latestJobs.map((job) => (
-            <div key={job._id} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow cursor-pointer"
+            <div key={job._id} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow duration-200 cursor-pointer transform hover:-translate-y-1"
                  onClick={() => setSelectedJob(job._id)}>
               <h3 className="text-lg font-semibold mb-1 truncate">{job.title}</h3>
               <p className="text-gray-600 mb-2 text-sm">{job.company}</p>
@@ -99,7 +99,7 @@ export function Dashboard() {
                 <span className="text-xs text-gray-500">
                   {new Date(job.deadline).toLocaleDateString()}
                 </span>
-                <button className="text-xs text-indigo-600 hover:underline">Apply Now</button>
+                <button className="text-xs text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">Apply Now</button>
               </div>
             </div>
           ))}
@@ -116,7 +116,7 @@ export function Dashboard() {
               Our platform connects you with talented professionals across various fields.
             </p>
           </div>
-          <button className="bg-white text-indigo-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
+          <button className="bg-white text-indigo-600 px-6 py-3 rounded-md font-medium hover:bg-gray-200 transition-all duration-200 hover:scale-105 hover:shadow-md">
             Post a Job
           </button>
         </div>
