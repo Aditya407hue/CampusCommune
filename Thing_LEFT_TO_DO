@@ -2,16 +2,13 @@
 
 ## Completed Features ✅
 
-- Edit profile functionality
-- Search feature implementation
-- MyJobs filter addition
 - TypeScript migration for backend
 - Tailwind CSS integration
-- shadcn/ui component library implementation
 - Real-time updates with Convex live queries
 - User authentication with role-based access
 - Basic job posting and management
 - Resume upload functionality
+- Improve form validation with react-hook-form
 
 ## Stack Improvements
 
@@ -22,10 +19,14 @@
 
 2. Frontend Modernization
    - Enhance component reusability
-   - Improve form validation with react-hook-form
    - Implement better state management
+   - shadcn/ui component library implementation
 
 ## Features To Implement
+
+- Edit profile functionality - backend route + frontend
+- Search feature implementation
+- MyJobs filter addition
 
 ### 1. Notification System
 
@@ -36,7 +37,7 @@
 ### 2. Application Management
 
 - Add detailed view for recent applications
-  - Endpoint: /applications/ce3a7b51-fa32-4c8e-8bc2-d489e3349355
+  - Endpoint: /applications/:id - show details in model view
 - Implement application status tracking (selected/rejected)
 - Integrate CSV processing for selected candidates
 - Add automated notification system for selection results
@@ -52,6 +53,7 @@
 
 ### 4. Job Management
 
+- Add job status - Drafted if PR has not yet approved the application
 - Add job sorting based on deadlines
 - Implement job interest marking system
 - Add role-based job filtering

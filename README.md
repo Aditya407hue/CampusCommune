@@ -46,39 +46,44 @@ A modern job portal application built with React, TypeScript, Convex, and Tailwi
 
 ## Database Models
 
-### User
+### Profile
 
-- id (system-generated)
+- userId (Id, references users)
+- role (enum: student, admin)
 - name (string)
-- email (string)
-- role (enum: student, admin, recruiter)
-- department (string, optional)
-- skills (array of strings, optional)
+- department (string)
+- graduationYear (number)
+- skills (array of strings)
+- resumeFileId (optional, Id references _storage)
 
 ### Job
 
-- id (system-generated)
 - title (string)
 - company (string)
-- location (string)
 - description (string)
-- requirements (string)
-- salary (string, optional)
-- jobType (enum: full-time, part-time, internship)
-- deadline (timestamp, optional)
+- location (string)
+- type (enum: full-time, internship, part-time)
+- skills (array of strings)
+- salary (optional, number)
+- deadline (number, Unix timestamp)
 - isActive (boolean)
-- recruiterId (Id)
-- createdAt (timestamp)
+- createdBy (Id, references users)
 
 ### Application
 
-- id (system-generated)
-- status (enum: pending, reviewed, accepted, rejected)
-- coverLetter (string, optional)
-- resumeId (string, optional)
-- studentId (Id)
-- jobId (Id)
-- createdAt (timestamp)
+- jobId (Id, references jobs)
+- studentId (Id, references users)
+- status (enum: pending, shortlisted, rejected, accepted)
+- appliedAt (number, Unix timestamp)
+- resumeFileId (Id, references _storage)
+
+### Notification
+
+- userId (Id, references users)
+- type (enum: new_job, status_update, deadline_reminder)
+- message (string)
+- read (boolean)
+- createdAt (number, Unix timestamp)
 
 ## Features
 

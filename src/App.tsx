@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { Id } from "../convex/_generated/dataModel";
+import { EditProfileForm } from "./components/EditProfileForm";
 import { JobCard } from "./components/JobCard";
 import { JobDetailsDialog } from "./components/JobDetailsDialog";
 import { ApplicationCard } from "./components/ApplicationCard";
@@ -217,9 +218,28 @@ function ApplicationsView({ isAdmin }: { isAdmin: boolean }) {
 }
 
 function ProfileView({ profile }: { profile: any }) {
+  const [isEditing, setIsEditing] = useState(false);
+
+  if (isEditing) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Edit Your Profile</h1>
+        <EditProfileForm profile={profile} onCancel={() => setIsEditing(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Your Profile</h1>
+        <button
+          onClick={() => setIsEditing(true)}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Edit Profile
+        </button>
+      </div>
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
