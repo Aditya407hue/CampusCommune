@@ -7,11 +7,13 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import { Toaster as Sonner } from "./components/ui/sonner";
+import { ThemeProvider } from "./components/theme-provider";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
     <Toaster />
     <Sonner />
     <BrowserRouter>
@@ -19,5 +21,6 @@ createRoot(document.getElementById("root")!).render(
       <App />
     </ConvexAuthProvider>
     </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>,
 );
