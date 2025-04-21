@@ -34,13 +34,26 @@ export const getProfile = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
+    const profile = await ctx.db
       .query("profiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
 
-      if(!user) return null;
-    return user;
+    if (!profile) return null;
+
+    // Fetch the user record from the 'users' table
+    const user = await ctx.db.get(userId);
+
+    if (!user) {
+      console.error(`User record not found for userId: ${userId}`);
+      return profile;
+    }
+
+    return {
+      ...profile,
+      email: user.email,
+      phone: user.phone,
+    };
   },
 });
 

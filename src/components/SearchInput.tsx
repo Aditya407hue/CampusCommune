@@ -7,7 +7,7 @@ interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const SearchInput = ({ className, ...props }: SearchInputProps) => {
   return (
     <div className="relative">
-      <SearchIcon className="absolute left-3 top-1/2 text-white -translate-y-1/2 h-4 w-4 text-gray-500" />
+      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
       <Input className={`pl-10 ${className}`} {...props} />
     </div>
   );

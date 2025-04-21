@@ -86,10 +86,20 @@ export const listByStudent = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    return await ctx.db
+    const applications = await ctx.db
       .query("applications")
       .withIndex("by_student", (q) => q.eq("studentId", userId))
       .collect();
+
+    // Fetch job details for each application
+    const applicationsWithJobDetails = await Promise.all(
+      applications.map(async (application) => {
+        const job = await ctx.db.get(application.jobId);
+        return { ...application, job }; // Combine application and job details
+      })
+    );
+
+    return applicationsWithJobDetails;
   },
 });
 
