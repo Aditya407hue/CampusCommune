@@ -70,3 +70,8 @@
 - Create Excel export functionality
 - Implement PR approval workflow
 - Add pending status for unapproved jobs
+
+### 7. Workflow Automation
+
+- Email fetch --- > http request to backend for checking all the companies with active deadline --->
+  then send the list of companies with active deadline and email to gemini and ask it to see whether the mail is an update from list of companies or its an new job update (and also give a flag in resposne) ---> if its from active companies then send it to backend as an update otherwise send it as a new job posting
