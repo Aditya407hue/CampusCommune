@@ -15,20 +15,38 @@ const applicationTables = {
   }).index("by_user", ["userId"]),
 
   jobs: defineTable({
-    title: v.string(),
-    company: v.string(),
-    description: v.string(),
-    location: v.string(),
-    type: v.union(
+    title: v.optional(v.string()), // Made optional
+    company: v.optional(v.string()), // Made optional
+    description: v.optional(v.string()), // Made optional
+    location: v.optional(v.string()), // Made optional
+    type: v.optional(v.union( // Made optional
       v.literal("full-time"),
       v.literal("internship"),
-      v.literal("part-time")
+      v.literal("part-time"),
+      v.literal("trainee") // Added trainee type
+    )),
+    skills: v.optional(v.array(v.string())), // Made optional
+    salary: v.optional( // Made optional and changed to object
+      v.object({
+        stipend: v.optional(v.string()),
+        postConfirmationCTC: v.optional(v.string()),
+      })
     ),
-    skills: v.array(v.string()),
-    salary: v.optional(v.number()),
-    deadline: v.number(), // Unix timestamp
-    isActive: v.boolean(),
-    createdBy: v.id("users"),
+    deadline: v.optional(v.string()), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
+    isActive: v.optional(v.boolean()), // Made optional
+    createdBy: v.optional(v.id("users")), // Made optional
+    applicationLink: v.optional(v.string()), // Added new field
+    moreDetails: v.optional( // Added new field
+      v.object({
+        eligibility: v.optional(v.string()),
+        selectionProcess: v.optional(v.array(v.string())),
+        serviceAgreement: v.optional(v.string()),
+        training: v.optional(v.string()),
+        joiningDate: v.optional(v.string()),
+        requiredDocuments: v.optional(v.string()), // Kept as string for simplicity, could be array
+        companyWebsite: v.optional(v.string()),
+      })
+    ),
   })
     .index("by_active", ["isActive"])
     .index("by_deadline", ["deadline"]),

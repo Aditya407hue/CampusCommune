@@ -18,6 +18,8 @@
    - Implement comprehensive error handling
 
 2. Frontend Modernization
+   - Edit Navbar (remove the down border)
+   - Add logo to the navbar
    - Enhance component reusability
    - Implement better state management
    - shadcn/ui component library implementation
@@ -75,3 +77,25 @@
 
 - Email fetch --- > http request to backend for checking all the companies with active deadline --->
   then send the list of companies with active deadline and email to gemini and ask it to see whether the mail is an update from list of companies or its an new job update (and also give a flag in resposne) ---> if its from active companies then send it to backend as an update otherwise send it as a new job posting
+
+### New Workflow model
+
+- Watch for new mail
+- Iterate for attachments
+- If there is any attachment then using array aggregator and iterator to store the attachments in google drive and get the link of the file
+- Send the link of the file to backend
+- Now send the mail to gemini
+- Ask it to see whether the mail is an update from list of companies or its an new job update (and also give a flag in resposne)
+- If yes, then send it to gemini once more and summarise the update and send it to backend as an update
+- If no, then send it to gemini once more and format as a new job posting and then send it to backend as a new job posting
+
+--Done the workflow just need to add the backend part
+
+--need to add the update-job schema , routes and controllers
+--need to expose the api of create job posting
+--need to add PR in in user role , need to create its dashboard , need to add the update job form (dashboard should show the job posting and the original email from which it was posted)
+-- add notification system for PR approval
+-- add notification system for job updates
+
+<!-- -- add notification system for deadline reminders
+-- add notification system for new job postings -->
