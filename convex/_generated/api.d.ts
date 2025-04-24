@@ -16,7 +16,9 @@ import type {
 import type * as applications from "../applications.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as jobUpdates from "../jobUpdates.js";
 import type * as jobs from "../jobs.js";
+import type * as mails from "../mails.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 
@@ -32,7 +34,9 @@ declare const fullApi: ApiFromModules<{
   applications: typeof applications;
   auth: typeof auth;
   http: typeof http;
+  jobUpdates: typeof jobUpdates;
   jobs: typeof jobs;
+  mails: typeof mails;
   storage: typeof storage;
   users: typeof users;
 }>;

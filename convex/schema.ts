@@ -15,10 +15,12 @@ const applicationTables = {
   }).index("by_user", ["userId"]),
 
   jobs: defineTable({
-    title: v.optional(v.string()), // Made optional
-    company: v.optional(v.string()), // Made optional
-    description: v.optional(v.string()), // Made optional
-    location: v.optional(v.string()), // Made optional
+    title: v.optional(v.union((v.string()), v.null())), // Made optional
+    company: v.optional(v.union((v.string()), v.null())), // Made optional
+    description: v.optional(v.union((v.string()), v.null())), // Made optional
+    location: v.optional(v.union((v.string()), v.null())), // Made optional
+    isApproved : v.optional(v.boolean()), // Added new field
+    approvedBy: v.optional(v.id("users")), // Made optional
     type: v.optional(v.union( // Made optional
       v.literal("full-time"),
       v.literal("internship"),
@@ -26,27 +28,28 @@ const applicationTables = {
       v.literal("trainee") // Added trainee type
     )),
     skills: v.optional(v.array(v.string())), // Made optional
-    salary: v.optional( // Made optional and changed to object
+    salary: v.optional(v.union( // Made optional and changed to object
       v.object({
-        stipend: v.optional(v.string()),
-        postConfirmationCTC: v.optional(v.string()),
-      })
+        stipend:v.optional(v.union((v.string()), v.null())),
+        postConfirmationCTC: v.optional(v.union((v.string()), v.null())),
+      }), v.null())
     ),
-    deadline: v.optional(v.string()), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
+    deadline: v.optional(v.union((v.string()), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
     isActive: v.optional(v.boolean()), // Made optional
     createdBy: v.optional(v.id("users")), // Made optional
-    applicationLink: v.optional(v.string()), // Added new field
-    moreDetails: v.optional( // Added new field
+    applicationLink:v.optional(v.union((v.string()), v.null())), // Added new field
+    moreDetails: v.optional(v.union( // Added new field
       v.object({
-        eligibility: v.optional(v.string()),
+        eligibility: v.optional(v.union((v.string()), v.null())),
         selectionProcess: v.optional(v.array(v.string())),
-        serviceAgreement: v.optional(v.string()),
-        training: v.optional(v.string()),
-        joiningDate: v.optional(v.string()),
-        requiredDocuments: v.optional(v.string()), // Kept as string for simplicity, could be array
-        companyWebsite: v.optional(v.string()),
-      })
+        serviceAgreement: v.optional(v.union((v.string()), v.null())),
+        training: v.optional(v.union((v.string()), v.null())),
+        joiningDate: v.optional(v.union((v.string()), v.null())),
+        requiredDocuments: v.optional(v.union((v.string()), v.null())), // Kept as string for simplicity, could be array
+        companyWebsite: v.optional(v.union((v.string()), v.null())),
+      }), v.null())
     ),
+    mailId : v.id("mails"),
   })
     .index("by_active", ["isActive"])
     .index("by_deadline", ["deadline"]),
@@ -77,6 +80,21 @@ const applicationTables = {
     read: v.boolean(),
     createdAt: v.number(),
   }).index("by_user_unread", ["userId", "read"]),
+
+  mails: defineTable({
+    mailContent: v.string(),
+    noOfAttachments: v.number(),
+    attachmentLinks: v.array(v.string()),
+    classification: v.string(),
+    reason: v.string(),
+  }),
+
+  jobUpdates: defineTable({
+    summary: v.optional(v.union((v.string()), v.null())),
+    mailId: v.id("mails"),
+    jobId: v.id("jobs"),
+    
+  }),
 };
 
 export default defineSchema({
