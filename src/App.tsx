@@ -9,6 +9,7 @@ import { DashboardView } from "./pages/DashboardView";
 import { JobsView } from "./pages/JobsView";
 import { ApplicationsView } from "./pages/ApplicationsView";
 import { ProfileView } from "./pages/ProfileView";
+import JobEditor from "./pages/JobEditor";
 
 function App() {
   const profile = useQuery(api.users.getProfile);
@@ -74,6 +75,7 @@ function App() {
               // Define routes for authenticated users with profiles
               <Routes>
                 <Route path="/dashboard" element={<DashboardView isAdmin={isAdmin ?? false}/>}/>
+                <Route path="/job-editor" element={<JobEditor/>}/>
                 <Route path="/jobs" element={<JobsView isAdmin={isAdmin ?? false} />} />
                 <Route path="/applications" element={<ApplicationsView isAdmin={isAdmin ?? false} />} />
                 <Route path="/profile" element={profile && <ProfileView profile={{email:"", phone:"", ...profile}} />} />
