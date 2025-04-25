@@ -33,7 +33,7 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm p-4 flex justify-between items-center border-b">
         <h2 className="text-xl font-semibold accent-text">
-          Campus Placement Hub
+          Campus Commune
         </h2>
         <div className="flex items-center gap-4">
           <Authenticated>
