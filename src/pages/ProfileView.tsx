@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom"; // Import Link for navigation
+import { FileText } from "lucide-react"; // Import an icon for the button
 import { Doc } from "convex/_generated/dataModel";
 import { useState } from "react";
 import Profile from "../components/Profile/Profile";
@@ -53,6 +55,14 @@ export function ProfileView({
           isEditing={isEditing}
           setIsEditing={setIsEditing}
         />
+
+        <Link
+          to="/ats-analysis"
+          className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
+          title="Analyze Resume with ATS"
+        >
+          <FileText className="h-6 w-6" />
+        </Link>
       </div>
     </div>
   );

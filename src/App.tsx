@@ -22,6 +22,7 @@ import { JobsView } from "./pages/JobsView";
 import { ApplicationsView } from "./pages/ApplicationsView";
 import { ProfileView } from "./pages/ProfileView";
 import JobEditor from "./pages/JobEditor";
+import AtsAnalysisView from "./pages/AtsAnalysisView"; // Import the new ATS analysis view
 
 function App() {
   const profile = useQuery(api.users.getProfile);
@@ -126,6 +127,8 @@ function App() {
                     )
                   }
                 />
+                <Route path="/ats-analysis" element={<AtsAnalysisView />} />{" "}
+                {/* Add route for ATS Analysis */}
                 {/* Default route redirects to /jobs */}
                 <Route
                   path="/"
