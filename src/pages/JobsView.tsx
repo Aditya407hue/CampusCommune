@@ -178,24 +178,33 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                     >
                       Job Type
                     </label>
-                    <Select
-                      name="type"
-                      value={filterValues.type}
-                      onValueChange={(value) =>
-                        setFilterValues((prev) => ({ ...prev, type: value }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Type" />
-                      </SelectTrigger>
-                      <SelectContent className="z-50">
-                        <SelectItem value="all">All Types</SelectItem>
-                        <SelectItem value="full-time">Full-time</SelectItem>
-                        <SelectItem value="part-time">Part-time</SelectItem>
-                        <SelectItem value="internship">Internship</SelectItem>
-                        <SelectItem value="trainee">Trainee</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        "all",
+                        "full-time",
+                        "part-time",
+                        "internship",
+                        "trainee",
+                      ].map((type) => (
+                        <Button
+                          key={type}
+                          variant={
+                            filterValues.type === type ? "default" : "ghost"
+                          }
+                          size="sm"
+                          onClick={() =>
+                            setFilterValues((prev) => ({ ...prev, type }))
+                          }
+                          className={`${
+                            filterValues.type === type
+                              ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-sm"
+                              : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200"
+                          } capitalize`}
+                        >
+                          {type === "all" ? "All Types" : type}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </CardContent>

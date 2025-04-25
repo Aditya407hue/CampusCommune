@@ -31,7 +31,7 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
       postConfirmationCTC: "Loading...",
     },
     location: "Loading...",
-    applicationLink: "Loading...",
+    applicationLink: ["Loading..."],
     deadline: "Loading...",
     moreDetails: {
       eligibility: "Loading...",

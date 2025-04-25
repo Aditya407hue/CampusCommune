@@ -6,145 +6,96 @@ import {
 } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { SignInForm } from "./SignInForm";
-import { SignOutButton } from "./SignOutButton";
 import { Toaster, toast } from "sonner";
 import { useForm } from "react-hook-form";
-import {
-  Routes,
-  Route,
-  Link,
-  Navigate,
-  useLocation,
-  Outlet,
-} from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { DashboardView } from "./pages/DashboardView";
 import { JobsView } from "./pages/JobsView";
 import { ApplicationsView } from "./pages/ApplicationsView";
 import { ProfileView } from "./pages/ProfileView";
 import JobEditor from "./pages/JobEditor";
-import AtsAnalysisView from "./pages/AtsAnalysisView"; // Import the new ATS analysis view
+import AtsAnalysisView from "./pages/AtsAnalysisView";
+import Navbar from "./components/Dashboard/Navbar";
 
 function App() {
   const profile = useQuery(api.users.getProfile);
   const isAdmin = useQuery(api.users.isAdmin);
   const location = useLocation();
 
+  // Function to render routes based on user role
+  const renderRoutes = () => {
+    if (profile === null) {
+      return (
+        <Routes>
+          <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="*" element={<Navigate to="/create-profile" replace />} />
+        </Routes>
+      );
+    }
+
+    // PR user specific routes
+    if (profile && profile.role === "pr") {
+      return (
+        <Routes>
+          <Route path="/jobs/new" element={<JobEditor />} />
+          <Route path="/jobs" element={<JobEditor />} />{" "}
+          {/* PR users see JobEditor as their main page */}
+          <Route
+            path="/profile"
+            element={
+              <ProfileView profile={{ email: "", phone: "", ...profile }} />
+            }
+          />
+          <Route path="/" element={<Navigate to="/jobs" replace />} />
+          <Route path="*" element={<Navigate to="/jobs" replace />} />
+        </Routes>
+      );
+    }
+
+    // Regular user routes (student/admin)
+    return (
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={<DashboardView isAdmin={isAdmin ?? false} />}
+        />
+        {isAdmin && <Route path="/jobs/new" element={<JobEditor />} />}{" "}
+        {/* Only admins can access JobEditor */}
+        <Route path="/jobs" element={<JobsView isAdmin={isAdmin ?? false} />} />
+        <Route
+          path="/applications"
+          element={<ApplicationsView isAdmin={isAdmin ?? false} />}
+        />
+        <Route
+          path="/profile"
+          element={
+            profile && (
+              <ProfileView profile={{ email: "", phone: "", ...profile }} />
+            )
+          }
+        />
+        <Route path="/ats-analysis" element={<AtsAnalysisView />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm p-4 flex justify-between items-center border-b">
-        <h2 className="text-xl font-semibold accent-text">
-          Campus Commune
-        </h2>
-        <div className="flex items-center gap-4">
-          <Authenticated>
-            <nav className="flex gap-4">
-              {/* Use Link components for navigation */}
-              <Link
-                to="/dashboard"
-                className={`px-3 py-1 rounded-md ${
-                  location.pathname === "/dashboard"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/jobs"
-                className={`px-3 py-1 rounded-md ${
-                  location.pathname === "/jobs"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Jobs
-              </Link>
-              <Link
-                to="/applications"
-                className={`px-3 py-1 rounded-md ${
-                  location.pathname === "/applications"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Applications
-              </Link>
-              <Link
-                to="/profile"
-                className={`px-3 py-1 rounded-md ${
-                  location.pathname === "/profile"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Profile
-              </Link>
-            </nav>
-          </Authenticated>
-          <SignOutButton />
-        </div>
-      </header>
+      <Authenticated>
+        <Navbar />
+      </Authenticated>
+
       <main
         className={`flex-1 ${location.pathname === "/dashboard" ? "" : "p-8"}`}
       >
         <div
           className={`${location.pathname === "/applications" ? "px-10" : ""}`}
         >
-          <Authenticated>
-            {/* Conditional rendering based on profile existence */}
-            {profile === null ? (
-              <Routes>
-                <Route path="/create-profile" element={<CreateProfile />} />
-                {/* Redirect any other authenticated path to create-profile if profile doesn't exist */}
-                <Route
-                  path="*"
-                  element={<Navigate to="/create-profile" replace />}
-                />
-              </Routes>
-            ) : (
-              // Define routes for authenticated users with profiles
-              <Routes>
-                <Route
-                  path="/dashboard"
-                  element={<DashboardView isAdmin={isAdmin ?? false} />}
-                />
-                <Route path="/job-editor" element={<JobEditor />} />
-                <Route
-                  path="/jobs"
-                  element={<JobsView isAdmin={isAdmin ?? false} />}
-                />
-                <Route
-                  path="/applications"
-                  element={<ApplicationsView isAdmin={isAdmin ?? false} />}
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    profile && (
-                      <ProfileView
-                        profile={{ email: "", phone: "", ...profile }}
-                      />
-                    )
-                  }
-                />
-                <Route path="/ats-analysis" element={<AtsAnalysisView />} />{" "}
-                {/* Add route for ATS Analysis */}
-                {/* Default route redirects to /jobs */}
-                <Route
-                  path="/"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-                {/* Optional: Add a 404 or catch-all route here */}
-                <Route
-                  path="*"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-              </Routes>
-            )}
-          </Authenticated>
+          <Authenticated>{renderRoutes()}</Authenticated>
           <Unauthenticated>
-            {/* Unauthenticated users see the sign-in form */}
-            <div className="max-w-md mx-auto">
+            {/* <div className="max-w-md mx-auto">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold mb-4">
                   Welcome to Campus Placement Hub
@@ -152,9 +103,10 @@ function App() {
                 <p className="text-gray-600">
                   Sign in to access job postings and manage your applications.
                 </p>
-              </div>
-              <SignInForm />
-            </div>
+              </div> */}
+            <SignInForm />
+            {/* <SignInButton /> */}
+            {/* </div> */}
           </Unauthenticated>
         </div>
       </main>
@@ -178,7 +130,7 @@ function CreateProfile() {
   const onSubmit = form.handleSubmit(
     async (data: {
       name: string;
-      role: "student" | "admin";
+      role: "student" | "admin" | "pr";
       department: string;
       graduationYear: number;
       skills: string[];
@@ -186,9 +138,11 @@ function CreateProfile() {
       try {
         await createProfile(data);
         toast.success("Profile created successfully!");
-        // No need to navigate here, the parent component will re-render with the profile
       } catch (error) {
-        toast.error("Failed to create profile");
+        console.error("Profile creation failed:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create profile"
+        );
       }
     }
   );
@@ -201,7 +155,7 @@ function CreateProfile() {
           Please provide your details to continue.
         </p>
       </div>
-      <form onSubmit={void onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Name
@@ -222,6 +176,7 @@ function CreateProfile() {
           >
             <option value="student">Student</option>
             <option value="admin">Admin</option>
+            <option value="pr">PR</option>
           </select>
         </div>
         <div>
