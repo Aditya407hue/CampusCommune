@@ -22,9 +22,9 @@
    - Add logo to the navbar
    - Enhance component reusability
    - Implement better state management
-   - shadcn/ui component library implementation
+   - shadcn/ui component library implementation ✅
 
-## Features To Implement
+## Features To Implement ✅
 
 - Edit profile functionality - backend route + frontend
 - Search feature implementation
@@ -44,7 +44,7 @@
 - Integrate CSV processing for selected candidates
 - Add automated notification system for selection results
 
-### 3. User Profile Enhancement
+### 3. User Profile Enhancement ✅
 
 - Update user model to include:
   - First name and last name
@@ -68,17 +68,19 @@
 
 ### 6. PR Integration
 
-- Develop email parsing for job details
-- Create Excel export functionality
+- PR should be able to see all the mails , review both job updates and new job postings
+- PR should be able to approve the job updates
+- PR should be able to reject the job updates
+- PR should be change the type of job posting (new job posting or update)
 - Implement PR approval workflow
 - Add pending status for unapproved jobs
 
-### 7. Workflow Automation
+### 7. Old Workflow Automation
 
 - Email fetch --- > http request to backend for checking all the companies with active deadline --->
   then send the list of companies with active deadline and email to gemini and ask it to see whether the mail is an update from list of companies or its an new job update (and also give a flag in resposne) ---> if its from active companies then send it to backend as an update otherwise send it as a new job posting
 
-### New Workflow model
+### 8. New Workflow model
 
 - Watch for new mail
 - Iterate for attachments
@@ -91,11 +93,12 @@
 
 --Done the workflow just need to add the backend part
 
---need to add the update-job schema , routes and controllers
---need to expose the api of create job posting
+### 9. Changes to be made in backend
+
+--need to add the update-job schema , routes and controllers ✅
+--need to expose the api of create job posting ✅
+--need to expose the api of update job posting ✅
 --need to add PR in in user role , need to create its dashboard , need to add the update job form (dashboard should show the job posting and the original email from which it was posted)
 -- add notification system for PR approval
 -- add notification system for job updates
-
-<!-- -- add notification system for deadline reminders
--- add notification system for new job postings -->
+-- fix attachments
