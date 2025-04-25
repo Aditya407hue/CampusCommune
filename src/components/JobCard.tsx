@@ -1,18 +1,11 @@
-import { Id } from "../../convex/_generated/dataModel";
+import { Doc, Id } from "../../convex/_generated/dataModel";
 
 interface JobCardProps {
-  job: {
-    _id: Id<"jobs">;
-    title: string;
-    company: string;
-    location: string;
-    type: "full-time" | "internship" | "part-time";
-    deadline: number;
-  };
+  job: Doc<"jobs">;
   onClick: () => void;
 }
 
-export function JobCard({ job, onClick }: JobCardProps) {
+export default function JobCard({ job, onClick }: JobCardProps) {
   return (
     <div
       onClick={onClick}
@@ -24,9 +17,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
         <span>{job.location}</span>
         <span className="capitalize">{job.type}</span>
       </div>
-      <div className="mt-4 text-sm text-gray-500">
-        Deadline: {new Date(job.deadline).toLocaleDateString()}
-      </div>
+      <div className="mt-4 text-sm text-gray-500">Deadline: {job.deadline}</div>
     </div>
   );
 }

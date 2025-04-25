@@ -1,20 +1,41 @@
-
 import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
-interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  onSearch?: () => void;
+  showButton?: boolean;
+}
 
-const SearchInput = ({ className, ...props }: SearchInputProps) => {
+const SearchInput = ({
+  className,
+  onSearch,
+  showButton = false,
+  ...props
+}: SearchInputProps) => {
   return (
-    <div className="relative">
-      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-      <Input className={`pl-10 ${className}`} {...props} />
+    <div className="relative flex w-full gap-2">
+      <Input
+        icon={<SearchIcon className="h-4 w-4" />}
+        className={`${className}`}
+        placeholder={props.placeholder || "Search..."}
+        {...props}
+      />
+      {showButton && (
+        <Button
+          onClick={onSearch}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          size="default"
+        >
+          Search
+        </Button>
+      )}
     </div>
   );
 };
 
 import { PlaceholdersAndVanishInput } from "./../components/ui/vanish-input";
- 
+
 export function PlaceholdersAndVanishInputDemo() {
   const placeholders = [
     "What's the first rule of Fight Club?",
@@ -23,7 +44,7 @@ export function PlaceholdersAndVanishInputDemo() {
     "Write a Javascript method to reverse a string",
     "How to assemble your own PC?",
   ];
- 
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
   };
@@ -32,15 +53,12 @@ export function PlaceholdersAndVanishInputDemo() {
     console.log("submitted");
   };
   return (
-    <div className="flex flex-col justify-center  items-center px-4">
-      {/* <h2 className="mb-10 sm:mb-20 text-xl text-center sm:text-5xl dark:text-white text-black">
-
-      </h2> */}
+    <div className="flex flex-col justify-center items-center px-4 w-full">
       <PlaceholdersAndVanishInput
-      
         placeholders={placeholders}
         onChange={handleChange}
         onSubmit={onSubmit}
+        className="w-full max-w-lg"
       />
     </div>
   );

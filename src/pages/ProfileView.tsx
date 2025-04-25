@@ -2,53 +2,58 @@ import { Button } from "@/components/ui/button";
 import { Doc } from "convex/_generated/dataModel";
 import { useState } from "react";
 import Profile from "../components/Profile/Profile";
+import { UserIcon } from "lucide-react";
 
-export function ProfileView({ profile }: { profile: Doc<"profiles"> & { email: string | undefined, phone: string| undefined} }) { // Add ProfileView definition if missing or incomplete
-    // const updateProfile = useMutation(api.users.updateProfile);
-    const [isEditing, setIsEditing] = useState(false);
-  
-    if (!profile) {
-      return <div>Loading profile...</div>; // Or some other loading state
-    }
-  
-    // return (
-    //   <div className="max-w-2xl mx-auto">
-    //     <div className="flex justify-between items-center mb-6">
-    //       <h1 className="text-2xl font-bold">Your Profile</h1>
-    //       <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
-    //         {isEditing ? "Cancel" : "Edit Profile"}
-    //       </Button>
-    //     </div>
-  
-    //     {isEditing ? (
-    //       <EditProfileForm profile={profile} onSave={() => setIsEditing(false)} />
-    //     ) : (
-    //       <Card>
-    //         <CardContent className="p-6 space-y-4">
-    //           <p><strong>Name:</strong> {profile.name}</p>
-    //           <p><strong>Role:</strong> <span className="capitalize">{profile.role}</span></p>
-    //           <p><strong>Department:</strong> {profile.department}</p>
-    //           <p><strong>Graduation Year:</strong> {profile.graduationYear}</p>
-    //           <p><strong>Skills:</strong> {profile.skills?.join(', ') || 'N/A'}</p>
-    //           {/* Add other profile details here */}
-    //         </CardContent>
-    //       </Card>
-    //     )}
-    //   </div>
-    // );
-  
+export function ProfileView({
+  profile,
+}: {
+  profile: Doc<"profiles"> & {
+    email: string | undefined;
+    phone: string | undefined;
+  };
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+
+  if (!profile) {
     return (
-      <div className="mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Your Profile</h1>
-          <Button onClick={() => setIsEditing(!isEditing)} variant="outline">
-            {isEditing? "Cancel" : "Edit Profile"}
-          </Button>
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile information...</p>
         </div>
-  
-        <Profile profile={profile}/>
       </div>
-      
-    )
-  
+    );
   }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Simple header */}
+      <div className="bg-indigo-600 py-4 w-full">
+        <div className="w-full px-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <UserIcon className="h-6 w-6 text-white" />
+              <h1 className="text-2xl font-bold text-white">Your Profile</h1>
+            </div>
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              variant="outline"
+              className="bg-white text-indigo-700 hover:bg-indigo-50 border-none"
+            >
+              {isEditing ? "Cancel" : "Edit Profile"}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile content */}
+      <div className="w-full">
+        <Profile
+          profile={profile}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+        />
+      </div>
+    </div>
+  );
+}

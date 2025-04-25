@@ -30,7 +30,11 @@ http.route({
         !data.reason
       ) {
         return new Response(
-          JSON.stringify({ success: false, error: "Missing required fields: mailContent, noOfAttachments, attachmentLinks, classification, reason" }),
+          JSON.stringify({
+            success: false,
+            error:
+              "Missing required fields: mailContent, noOfAttachments, attachmentLinks, classification, reason",
+          }),
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
@@ -49,7 +53,8 @@ http.route({
       );
     } catch (error: any) {
       console.error("Error processing saveMail request:", error);
-      const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Internal Server Error";
       return new Response(
         JSON.stringify({ success: false, error: errorMessage }),
         { status: 500, headers: { "Content-Type": "application/json" } }
@@ -70,11 +75,11 @@ http.route({
 
     try {
       const data = await request.json();
-      
+
       // Validate required fields
-    //   if (!data.jobId) {
-    //     return new Response("Missing required field: jobId", { status: 400 });
-    //   }
+      //   if (!data.jobId) {
+      //     return new Response("Missing required field: jobId", { status: 400 });
+      //   }
 
       // Validate optional fields according to schema
       const updateData: any = {};
@@ -87,32 +92,32 @@ http.route({
       if (data.salary) {
         updateData.salary = {
           stipend: data.salary.stipend,
-          postConfirmationCTC: data.salary.postConfirmationCTC
+          postConfirmationCTC: data.salary.postConfirmationCTC,
         };
       }
       if (data.deadline) updateData.deadline = data.deadline;
       if (data.mailId) updateData.mailId = data.mailId;
 
-    //   console.log(data.mailId);
+      //   console.log(data.mailId);
       // Call the mutation
 
       const result = await ctx.runMutation(api.jobs.create, {
-        ...updateData
+        ...updateData,
       });
-
-
 
       return new Response(JSON.stringify(result), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
-
     } catch (error: any) {
       console.error("Error updating job via HTTP action:", error);
-      const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
-      const statusCode = errorMessage.includes("Invalid API Key") ? 401
-                       : errorMessage.includes("not found") ? 404
-                       : 500;
+      const errorMessage =
+        error instanceof Error ? error.message : "Internal Server Error";
+      const statusCode = errorMessage.includes("Invalid API Key")
+        ? 401
+        : errorMessage.includes("not found")
+          ? 404
+          : 500;
       return new Response(errorMessage, { status: statusCode });
     }
   }),
@@ -192,12 +197,14 @@ http.route({
     try {
       const { summary, mailId, companyName } = await request.json();
       console.log(summary, mailId, companyName);
-      
+
       // Basic validation
       if (!summary || !mailId || !companyName) {
-        return new Response("Missing required fields: jobId, summary, mailId", { status: 400 });
+        return new Response("Missing required fields: jobId, summary, mailId", {
+          status: 400,
+        });
       }
-       
+
       // Call the mutation
       const result = await ctx.runMutation(api.jobUpdates.create, {
         summary,
@@ -209,14 +216,48 @@ http.route({
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
-
     } catch (error: any) {
       console.error("Error updating job via HTTP action:", error);
-      const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
-      const statusCode = errorMessage.includes("Invalid API Key") ? 401
-                       : errorMessage.includes("not found") ? 404
-                       : 500;
+      const errorMessage =
+        error instanceof Error ? error.message : "Internal Server Error";
+      const statusCode = errorMessage.includes("Invalid API Key")
+        ? 401
+        : errorMessage.includes("not found")
+          ? 404
+          : 500;
       return new Response(errorMessage, { status: statusCode });
+    }
+  }),
+});
+
+http.route({
+  path: "/getActiveCompanies",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const apiKey = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const expectedApiKey = "abcd";
+    if (!apiKey || apiKey !== expectedApiKey) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+    try {
+      // Query your Convex function that returns active jobs
+      const activeJobs: Array<{ company: string }> = await ctx.runQuery(
+        api.jobs.listActiveJobs,
+        {}
+      );
+      const companies = activeJobs.map((job) => job.company);
+      return new Response(JSON.stringify({ success: true, companies }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      console.error("Error fetching active companies:", error);
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
+      return new Response(JSON.stringify({ success: false, error: message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   }),
 });

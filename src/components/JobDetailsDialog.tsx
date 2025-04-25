@@ -4,6 +4,17 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Building2Icon,
+  MapPinIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  BanknoteIcon,
+  FileUpIcon,
+  XIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface JobDetailsDialogProps {
   jobId: Id<"jobs">;
@@ -11,130 +22,294 @@ interface JobDetailsDialogProps {
 }
 
 export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
-  const job = useQuery(api.jobs.getById, { jobId });
-  const isAdmin = useQuery(api.users.isAdmin);
-  const [isUploading, setIsUploading] = useState(false);
+  const job = useQuery(api.jobs.getById, { jobId }) ?? {
+    companyName: "Loading...",
+    role: "Loading...",
+    jobDetails: "Loading...",
+    salary: {
+      stipend: "Loading...",
+      postConfirmationCTC: "Loading...",
+    },
+    location: "Loading...",
+    applicationLink: "Loading...",
+    deadline: "Loading...",
+    moreDetails: {
+      eligibility: "Loading...",
+      selectionProcess: ["Loading..."],
+      serviceAgreement: "Loading...",
+      training: "Loading...",
+      joiningDate: "Loading...",
+      requiredDocuments: "Loading...",
+      companyWebsite: "Loading...",
+    },
+  };
   const apply = useMutation(api.applications.apply);
-  const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
+  const [resume, setResume] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
 
-  if (!job) return null;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setResume(files[0]);
+    }
+  };
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsUploading(true);
+    if (!resume) {
+      toast.error("Please upload your resume");
+      return;
+    }
 
     try {
-      const input = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement;
-      const file = input.files?.[0];
-      if (!file) {
-        toast.error("Please select a resume file");
-        return;
-      }
-
-      // Get upload URL
-      const postUrl = await generateUploadUrl();
-
-      // Upload file
-      const result = await fetch(postUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      const { storageId } = await result.json();
-
-      // Submit application
-      await apply({ jobId, resumeFileId: storageId });
-      toast.success("Application submitted successfully!");
-      onClose();
-    } catch (error) {
-      toast.error("Failed to submit application");
-    } finally {
+      setIsUploading(true);
+      await apply({ jobId, file: resume });
       setIsUploading(false);
+      setHasApplied(true);
+      toast.success("Application submitted successfully!");
+    } catch (error) {
+      setIsUploading(false);
+      toast.error("Failed to submit application");
+      console.error(error);
     }
   };
 
   return (
     <Dialog open={true} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        aria-hidden="true"
+      />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-2xl w-full bg-white rounded-xl p-6">
-          <Dialog.Title className="text-2xl font-bold mb-4">{job.title}</Dialog.Title>
-          <div className="space-y-4">
+        <Dialog.Panel className="mx-auto max-w-3xl w-full bg-white rounded-2xl p-8 shadow-xl">
+          {/* Header with close button */}
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <h4 className="font-medium">Company</h4>
-              <p className="text-gray-600">{job.company}</p>
-            </div>
-            <div>
-              <h4 className="font-medium">Location</h4>
-              <p className="text-gray-600">{job.location}</p>
-            </div>
-            <div>
-              <h4 className="font-medium">Job Type</h4>
-              <p className="text-gray-600 capitalize">{job.type}</p>
-            </div>
-            {job.salary && (
-              <div>
-                <h4 className="font-medium">Salary</h4>
-                <p className="text-gray-600">${job.salary.toLocaleString()}/year</p>
+              <Dialog.Title className="text-2xl font-bold text-gray-800">
+                {job.title}
+              </Dialog.Title>
+              <div className="flex items-center text-gray-600 mt-1">
+                <Building2Icon className="h-4 w-4 mr-2" />
+                <span>{job.company}</span>
               </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <XIcon className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Job tags/badges */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {job.type && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 capitalize">
+                <BriefcaseIcon className="h-3 w-3 mr-1" />
+                {job.type}
+              </span>
             )}
-            <div>
-              <h4 className="font-medium">Required Skills</h4>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {job.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {job.location && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <MapPinIcon className="h-3 w-3 mr-1" />
+                {job.location}
+              </span>
+            )}
+            {job.deadline && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                <CalendarIcon className="h-3 w-3 mr-1" />
+                Deadline: {job.deadline}
+              </span>
+            )}
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="md:col-span-2 space-y-6">
+              {/* Description */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  Description
+                </h4>
+                <div className="text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                  {job.description ?? "No description provided."}
+                </div>
               </div>
+
+              {/* Salary information */}
+              {job.salary &&
+                (job.salary.stipend || job.salary.postConfirmationCTC) && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                      <BanknoteIcon className="h-4 w-4 mr-2 text-green-600" />
+                      Compensation
+                    </h4>
+                    <div className="text-gray-600 space-y-1">
+                      {job.salary.stipend && (
+                        <div className="flex items-center">
+                          <span className="font-medium">Stipend:</span>
+                          <span className="ml-2">{job.salary.stipend}</span>
+                        </div>
+                      )}
+                      {job.salary.postConfirmationCTC && (
+                        <div className="flex items-center">
+                          <span className="font-medium">CTC:</span>
+                          <span className="ml-2">
+                            {job.salary.postConfirmationCTC}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
             </div>
-            <div>
-              <h4 className="font-medium">Description</h4>
-              <p className="text-gray-600 whitespace-pre-wrap">{job.description}</p>
-            </div>
-            <div>
-              <h4 className="font-medium">Application Deadline</h4>
-              <p className="text-gray-600">
-                {new Date(job.deadline).toLocaleDateString()}
-              </p>
+
+            <div className="space-y-6">
+              {/* Skills */}
+              {job.skills && job.skills.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">
+                    Required Skills
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {job.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* More details if available */}
+              {job.moreDetails && (
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">
+                    Additional Information
+                  </h4>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    {job.moreDetails.eligibility && (
+                      <div>
+                        <span className="font-medium">Eligibility:</span>
+                        <p>{job.moreDetails.eligibility}</p>
+                      </div>
+                    )}
+                    {job.moreDetails.selectionProcess && (
+                      <div>
+                        <span className="font-medium">Selection Process:</span>
+                        <p>{job.moreDetails.selectionProcess}</p>
+                      </div>
+                    )}
+                    {job.moreDetails.joiningDate && (
+                      <div>
+                        <span className="font-medium">Joining Date:</span>
+                        <p>{job.moreDetails.joiningDate}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          {!isAdmin && (
-            <form onSubmit={handleApply} className="mt-6">
-              <div className="mb-4">
+
+          {/* Application form */}
+          <Separator className="my-6" />
+          {hasApplied ? (
+            <div className="text-center p-6 bg-green-50 rounded-xl">
+              <div className="text-5xl mb-4">✅</div>
+              <h3 className="text-xl font-semibold text-green-800 mb-2">
+                Application Submitted!
+              </h3>
+              <p className="text-green-700">
+                Your application has been submitted successfully. You can track
+                its status in the Applications section.
+              </p>
+              <Button
+                onClick={onClose}
+                className="mt-4 bg-white text-green-700 border border-green-200 hover:bg-green-50"
+              >
+                Close
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleApply} className="space-y-4">
+              <h3 className="text-lg font-semibold">Submit Your Application</h3>
+
+              <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Upload Resume (PDF)
+                  Upload Resume (PDF, DOC, DOCX)
                 </label>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  required
-                  className="mt-1 block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-indigo-50 file:text-indigo-700
-                    hover:file:bg-indigo-100"
-                />
+                <div className="flex items-center">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none cursor-pointer">
+                    <FileUpIcon className="h-4 w-4" />
+                    {resume ? resume.name : "Select File"}
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      className="sr-only"
+                    />
+                  </label>
+                  {resume && (
+                    <button
+                      type="button"
+                      onClick={() => setResume(null)}
+                      className="ml-2 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">Max file size: 5MB</p>
               </div>
-              <div className="flex justify-end gap-4">
-                <button
+
+              <div className="flex justify-end gap-4 pt-4">
+                <Button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  variant="outline"
+                  className="px-4 py-2"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  disabled={isUploading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                  disabled={isUploading || !resume}
+                  className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isUploading ? "Uploading..." : "Apply Now"}
-                </button>
+                  {isUploading ? (
+                    <div className="flex items-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Submitting...
+                    </div>
+                  ) : (
+                    "Apply Now"
+                  )}
+                </Button>
               </div>
             </form>
           )}
