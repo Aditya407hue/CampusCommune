@@ -22,9 +22,9 @@
    - Add logo to the navbar
    - Enhance component reusability
    - Implement better state management
-   - shadcn/ui component library implementation
+   - shadcn/ui component library implementation ✅
 
-## Features To Implement
+## Features To Implement ✅
 
 - Edit profile functionality - backend route + frontend
 - Search feature implementation
@@ -44,7 +44,7 @@
 - Integrate CSV processing for selected candidates
 - Add automated notification system for selection results
 
-### 3. User Profile Enhancement
+### 3. User Profile Enhancement ✅
 
 - Update user model to include:
   - First name and last name
@@ -101,3 +101,4 @@
 --need to add PR in in user role , need to create its dashboard , need to add the update job form (dashboard should show the job posting and the original email from which it was posted)
 -- add notification system for PR approval
 -- add notification system for job updates
+-- fix attachments
