@@ -1,17 +1,20 @@
-import { Card, CardContent } from "@/components/ui/card";
-
 interface TextViewerProps {
   text: string;
 }
 
-export const TextViewer = ({ text }: TextViewerProps) => {
+export function TextViewer({ text }: TextViewerProps) {
   return (
-    <Card className="bg-white">
-      <CardContent className="p-6">
-        <div className="whitespace-pre-wrap font-mono text-sm">
-          {text}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="prose prose-sm max-w-none">
+      {text.split("\n").map((line, index) => (
+        <p
+          key={index}
+          className={`mb-2 ${
+            line.trim() === "" ? "h-4" : "text-gray-700 leading-relaxed"
+          }`}
+        >
+          {line}
+        </p>
+      ))}
+    </div>
   );
-};
+}

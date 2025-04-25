@@ -16,11 +16,11 @@ export const JsonEditor = ({ data, isEditMode, onChange }: JsonEditorProps) => {
   const handleChange = (path: string[], value: any) => {
     const newData = { ...formData };
     let current = newData;
-    
+
     for (let i = 0; i < path.length - 1; i++) {
       current = current[path[i]];
     }
-    
+
     current[path[path.length - 1]] = value;
     setFormData(newData);
     onChange(newData);
@@ -31,14 +31,20 @@ export const JsonEditor = ({ data, isEditMode, onChange }: JsonEditorProps) => {
       return (
         <Input
           value={value.join(", ")}
-          onChange={(e) => handleChange(path, e.target.value.split(", ").map(s => s.trim()))}
+          onChange={(e) =>
+            handleChange(
+              path,
+              e.target.value.split(", ").map((s) => s.trim())
+            )
+          }
           placeholder={`Enter ${label} (comma-separated)`}
         />
       );
     }
-    
+
     if (typeof value === "string") {
-      return label.toLowerCase().includes("description") || label.toLowerCase().includes("process") ? (
+      return label.toLowerCase().includes("description") ||
+        label.toLowerCase().includes("process") ? (
         <Textarea
           value={value}
           onChange={(e) => handleChange(path, e.target.value)}
@@ -52,20 +58,24 @@ export const JsonEditor = ({ data, isEditMode, onChange }: JsonEditorProps) => {
         />
       );
     }
-    
+
     return null;
   };
 
   const renderField = (key: string, value: any, path: string[] = []) => {
     const currentPath = [...path, key];
-    const label = key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase());
+    const label = key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       return (
         <div key={key} className="space-y-4">
           <h3 className="text-lg font-semibold mt-4 first:mt-0">{label}</h3>
           <div className="pl-4 space-y-4">
-            {Object.entries(value).map(([k, v]) => renderField(k, v, currentPath))}
+            {Object.entries(value).map(([k, v]) =>
+              renderField(k, v, currentPath)
+            )}
           </div>
         </div>
       );
@@ -89,7 +99,9 @@ export const JsonEditor = ({ data, isEditMode, onChange }: JsonEditorProps) => {
     <Card className="bg-white">
       <CardContent className="p-6">
         <div className="space-y-6">
-          {Object.entries(formData).map(([key, value]) => renderField(key, value))}
+          {Object.entries(formData).map(([key, value]) =>
+            renderField(key, value)
+          )}
         </div>
       </CardContent>
     </Card>

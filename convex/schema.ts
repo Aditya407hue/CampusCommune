@@ -6,7 +6,7 @@ import { authTables } from "@convex-dev/auth/server";
 const applicationTables = {
   profiles: defineTable({
     userId: v.id("users"),
-    role: v.union(v.literal("student"), v.literal("admin")),
+    role: v.union(v.literal("student"), v.literal("admin"), v.literal("pr")), // Added PR role
     name: v.string(),
     department: v.string(),
     graduationYear: v.number(),
