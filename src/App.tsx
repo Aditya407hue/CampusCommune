@@ -10,6 +10,7 @@ import { JobsView } from "./pages/JobsView";
 import { ApplicationsView } from "./pages/ApplicationsView";
 import { ProfileView } from "./pages/ProfileView";
 import JobEditor from "./pages/JobEditor";
+import AtsAnalysisView from "./pages/AtsAnalysisView"; // Import the new ATS analysis view
 
 function App() {
   const profile = useQuery(api.users.getProfile);
@@ -75,10 +76,12 @@ function App() {
               // Define routes for authenticated users with profiles
               <Routes>
                 <Route path="/dashboard" element={<DashboardView isAdmin={isAdmin ?? false}/>}/>
+                <Route path="/atss" element={<AtsAnalysisView />}/>
                 <Route path="/job-editor" element={<JobEditor/>}/>
                 <Route path="/jobs" element={<JobsView isAdmin={isAdmin ?? false} />} />
                 <Route path="/applications" element={<ApplicationsView isAdmin={isAdmin ?? false} />} />
                 <Route path="/profile" element={profile && <ProfileView profile={{email:"", phone:"", ...profile}} />} />
+                <Route path="/ats-analysis" element={<AtsAnalysisView />} /> {/* Add route for ATS Analysis */}
                 {/* Default route redirects to /jobs */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 {/* Optional: Add a 404 or catch-all route here */}
