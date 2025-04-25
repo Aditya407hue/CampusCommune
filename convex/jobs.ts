@@ -4,36 +4,47 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const create = mutation({
   args: {
-    title: v.optional(v.union((v.string()), v.null())), // Made optional
-    company: v.optional(v.union((v.string()), v.null())), // Made optional
-    description: v.optional(v.union((v.string()), v.null())), // Made optional
-    location: v.optional(v.union((v.string()), v.null())), // Made optional
-    type: v.optional(v.union( // Made optional
-      v.literal("full-time"),
-      v.literal("internship"),
-      v.literal("part-time"),
-      v.literal("trainee") // Added trainee type
-    )),
-    skills: v.optional(v.array(v.string())), // Made optional
-    salary: v.optional(v.union( // Made optional and changed to object
-      v.object({
-        stipend:v.optional(v.union((v.string()), v.null())),
-        postConfirmationCTC: v.optional(v.union((v.string()), v.null())),
-      }), v.null())
+    title: v.optional(v.union(v.string(), v.null())), // Made optional
+    company: v.optional(v.union(v.string(), v.null())), // Made optional
+    description: v.optional(v.union(v.string(), v.null())), // Made optional
+    location: v.optional(v.union(v.string(), v.null())), // Made optional
+    type: v.optional(
+      v.union(
+        // Made optional
+        v.literal("full-time"),
+        v.literal("internship"),
+        v.literal("part-time"),
+        v.literal("trainee") // Added trainee type
+      )
     ),
-    deadline: v.optional(v.union((v.string()), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
+    skills: v.optional(v.array(v.string())), // Made optional
+    salary: v.optional(
+      v.union(
+        // Made optional and changed to object
+        v.object({
+          stipend: v.optional(v.union(v.string(), v.null())),
+          postConfirmationCTC: v.optional(v.union(v.string(), v.null())),
+        }),
+        v.null()
+      )
+    ),
+    deadline: v.optional(v.union(v.string(), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
 
-    applicationLink:v.optional(v.union((v.string()), v.null())), // Added new field
-    moreDetails: v.optional(v.union( // Added new field
-      v.object({
-        eligibility: v.optional(v.union((v.string()), v.null())),
-        selectionProcess: v.optional(v.array(v.string())),
-        serviceAgreement: v.optional(v.union((v.string()), v.null())),
-        training: v.optional(v.union((v.string()), v.null())),
-        joiningDate: v.optional(v.union((v.string()), v.null())),
-        requiredDocuments: v.optional(v.union((v.string()), v.null())), // Kept as string for simplicity, could be array
-        companyWebsite: v.optional(v.union((v.string()), v.null())),
-      }), v.null())
+    applicationLink: v.optional(v.union(v.string(), v.null())), // Added new field
+    moreDetails: v.optional(
+      v.union(
+        // Added new field
+        v.object({
+          eligibility: v.optional(v.union(v.string(), v.null())),
+          selectionProcess: v.optional(v.array(v.string())),
+          serviceAgreement: v.optional(v.union(v.string(), v.null())),
+          training: v.optional(v.union(v.string(), v.null())),
+          joiningDate: v.optional(v.union(v.string(), v.null())),
+          requiredDocuments: v.optional(v.union(v.string(), v.null())), // Kept as string for simplicity, could be array
+          companyWebsite: v.optional(v.union(v.string(), v.null())),
+        }),
+        v.null()
+      )
     ),
     mailId: v.id("mails"), // Added mailId argument
   },
@@ -71,7 +82,9 @@ export const list = query({
   handler: async (ctx, args) => {
     const q = ctx.db.query("jobs");
     if (args.onlyActive) {
-      return await q.withIndex("by_active", (q) => q.eq("isActive", true)).collect();
+      return await q
+        .withIndex("by_active", (q) => q.eq("isActive", true))
+        .collect();
     }
     return await q.collect();
   },
@@ -84,3 +97,16 @@ export const getById = query({
   },
 });
 
+export const listActiveJobs = query({
+  args: {},
+  returns: v.array(v.object({ company: v.string() })),
+  handler: async (ctx, args) => {
+    const activeJobs = await ctx.db
+      .query("jobs")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+    return activeJobs
+      .filter((job) => job.company != null)
+      .map((job) => ({ company: job.company! }));
+  },
+});
