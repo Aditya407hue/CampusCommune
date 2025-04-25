@@ -4,7 +4,8 @@ import { Edit, View } from "lucide-react";
 import { TextViewer } from "@/components/JobEditor/TextViewer";
 import { JsonEditor } from "@/components/JobEditor/JsonEditor";
 
-const sampleText = "Welcome to the Job Editor!\n\nThis is a sample text that demonstrates how new lines work.\nYou can edit the JSON on the right side.\n\nThe editor supports:\n- View mode\n- Edit mode\n- JSON validation\n- Easy formatting";
+const sampleText =
+  "Welcome to the Job Editor!\n\nThis is a sample text that demonstrates how new lines work.\nYou can edit the JSON on the right side.\n\nThe editor supports:\n- View mode\n- Edit mode\n- JSON validation\n- Easy formatting";
 
 const initialJobData = {
   title: "",
@@ -15,10 +16,10 @@ const initialJobData = {
   skills: ["Java", "C++"],
   salary: {
     stipend: "",
-    postConfirmationCTC: ""
+    postConfirmationCTC: "",
   },
   deadline: "",
-  applicationLink: "",
+  applicationLink: [""],
   moreDetails: {
     eligibility: "",
     selectionProcess: "",
@@ -26,8 +27,8 @@ const initialJobData = {
     training: "",
     joiningDate: "",
     requiredDocuments: "",
-    companyWebsite: ""
-  }
+    companyWebsite: "",
+  },
 };
 
 const JobEditor = () => {

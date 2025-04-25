@@ -15,41 +15,52 @@ const applicationTables = {
   }).index("by_user", ["userId"]),
 
   jobs: defineTable({
-    title: v.optional(v.union((v.string()), v.null())), // Made optional
-    company: v.optional(v.union((v.string()), v.null())), // Made optional
-    description: v.optional(v.union((v.string()), v.null())), // Made optional
-    location: v.optional(v.union((v.string()), v.null())), // Made optional
-    isApproved : v.optional(v.boolean()), // Added new field
+    title: v.optional(v.union(v.string(), v.null())), // Made optional
+    company: v.optional(v.union(v.string(), v.null())), // Made optional
+    description: v.optional(v.union(v.string(), v.null())), // Made optional
+    location: v.optional(v.union(v.string(), v.null())), // Made optional
+    isApproved: v.optional(v.boolean()), // Added new field
     approvedBy: v.optional(v.id("users")), // Made optional
-    type: v.optional(v.union( // Made optional
-      v.literal("full-time"),
-      v.literal("internship"),
-      v.literal("part-time"),
-      v.literal("trainee") // Added trainee type
-    )),
-    skills: v.optional(v.array(v.string())), // Made optional
-    salary: v.optional(v.union( // Made optional and changed to object
-      v.object({
-        stipend:v.optional(v.union((v.string()), v.null())),
-        postConfirmationCTC: v.optional(v.union((v.string()), v.null())),
-      }), v.null())
+    type: v.optional(
+      v.union(
+        // Made optional
+        v.literal("full-time"),
+        v.literal("internship"),
+        v.literal("part-time"),
+        v.literal("trainee") // Added trainee type
+      )
     ),
-    deadline: v.optional(v.union((v.string()), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
+    skills: v.optional(v.array(v.string())), // Made optional
+    salary: v.optional(
+      v.union(
+        // Made optional and changed to object
+        v.object({
+          stipend: v.optional(v.union(v.string(), v.null())),
+          postConfirmationCTC: v.optional(v.union(v.string(), v.null())),
+        }),
+        v.null()
+      )
+    ),
+    deadline: v.optional(v.union(v.string(), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
     isActive: v.optional(v.boolean()), // Made optional
     createdBy: v.optional(v.id("users")), // Made optional
-    applicationLink:v.optional(v.union((v.string()), v.null())), // Added new field
-    moreDetails: v.optional(v.union( // Added new field
-      v.object({
-        eligibility: v.optional(v.union((v.string()), v.null())),
-        selectionProcess: v.optional(v.array(v.string())),
-        serviceAgreement: v.optional(v.union((v.string()), v.null())),
-        training: v.optional(v.union((v.string()), v.null())),
-        joiningDate: v.optional(v.union((v.string()), v.null())),
-        requiredDocuments: v.optional(v.union((v.string()), v.null())), // Kept as string for simplicity, could be array
-        companyWebsite: v.optional(v.union((v.string()), v.null())),
-      }), v.null())
+    applicationLink: v.optional(v.union(v.array(v.string()), v.null())), // Added new field
+    moreDetails: v.optional(
+      v.union(
+        // Added new field
+        v.object({
+          eligibility: v.optional(v.union(v.string(), v.null())),
+          selectionProcess: v.optional(v.array(v.string())),
+          serviceAgreement: v.optional(v.union(v.string(), v.null())),
+          training: v.optional(v.union(v.string(), v.null())),
+          joiningDate: v.optional(v.union(v.string(), v.null())),
+          requiredDocuments: v.optional(v.union(v.string(), v.null())), // Kept as string for simplicity, could be array
+          companyWebsite: v.optional(v.union(v.string(), v.null())),
+        }),
+        v.null()
+      )
     ),
-    mailId : v.id("mails"),
+    mailId: v.id("mails"),
   })
     .index("by_active", ["isActive"])
     .index("by_deadline", ["deadline"]),
@@ -90,10 +101,9 @@ const applicationTables = {
   }),
 
   jobUpdates: defineTable({
-    summary: v.optional(v.union((v.string()), v.null())),
+    summary: v.optional(v.union(v.string(), v.null())),
     mailId: v.id("mails"),
     jobId: v.id("jobs"),
-    
   }),
 };
 

@@ -30,7 +30,7 @@ export const create = mutation({
     ),
     deadline: v.optional(v.union(v.string(), v.null())), // Made optional and changed to string to accommodate format like "23rd April, 12pm"
 
-    applicationLink: v.optional(v.union(v.string(), v.null())), // Added new field
+    applicationLink: v.optional(v.union(v.array(v.string()), v.null())), // Added new field
     moreDetails: v.optional(
       v.union(
         // Added new field
@@ -66,7 +66,7 @@ export const create = mutation({
     return await ctx.db.insert("jobs", {
       ...restArgs, // Spread the rest of the arguments
       salary: salary, // Pass the salary object (or undefined) explicitly
-      applicationLink: applicationLink, // Pass the application link
+      applicationLink: applicationLink,
       moreDetails: moreDetails, // Pass the more details object
       isActive: true,
       isApproved: false, // Default to not approved
