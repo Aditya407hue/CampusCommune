@@ -1,0 +1,2 @@
+add status in jobs list api for showing if user has already applied to this job
+add jobs with status draft/pending if the mail is not yet approved
