@@ -59,7 +59,7 @@ export function NotificationDropdown() {
               variant="ghost"
               size="sm"
               className="h-8 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 flex items-center gap-1"
-              onClick={() => handleMarkAllAsRead}
+              onClick={(e) => handleMarkAllAsRead(e)}
             >
               <CheckCheck className="h-3.5 w-3.5" />
               Mark all as read
