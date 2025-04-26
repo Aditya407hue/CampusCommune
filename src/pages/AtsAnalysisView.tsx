@@ -58,10 +58,12 @@ function AtsAnalysisView() {
       return;
     }
 
-    if (!jobDescription) {
-      toast.error("Please enter a job description.");
-      return;
-    }
+    // Allow analysis even if job description is empty
+    // The backend service will handle the case where jobDescription is null or empty.
+    // if (!jobDescription) {
+    //   toast.error("Please enter a job description.");
+    //   return;
+    // }
 
     setIsLoading(true);
     setAnalysisResult(null);
@@ -72,7 +74,7 @@ function AtsAnalysisView() {
 
       const result = await analyzeResume(
         resumeUrl,
-        jobDescription,
+        jobDescription || null, // Pass null if jobDescription is empty
         analysisType
       );
 
@@ -179,7 +181,7 @@ function AtsAnalysisView() {
             </Card>
 
             {/* Analysis Options Card */}
-            <Card className="bg-white border-0 shadow-sm overflow-hidden">
+            {/* <Card className="bg-white border-0 shadow-sm overflow-hidden">
               <CardHeader className="pb-2 border-b bg-gray-50/80">
                 <CardTitle className="text-lg font-semibold text-gray-800">
                   Analysis Options
@@ -229,10 +231,11 @@ function AtsAnalysisView() {
                       </Label>
                     </div>
                   </div>
-                </RadioGroup>
-
-                {/* Analyze Button - moved here for better UI flow */}
-                <div className="mt-6">
+                </RadioGroup>     
+              </CardContent>
+            </Card> 
+            */}
+               <div className="mt-6">
                   <Button
                     onClick={handleAnalyze}
                     disabled={isLoading || !jobDescription || !resume}
@@ -249,8 +252,6 @@ function AtsAnalysisView() {
                     )}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Right Section: Results */}

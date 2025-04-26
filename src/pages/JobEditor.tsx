@@ -177,7 +177,9 @@ const JobEditor = () => {
   const { isAuthenticated, userId, userProfile } = useCurrentUserProfile();
 
   // Get mail data
-  const mails = useQuery(api.mails.getUnapprovedMails);
+  const mails = useQuery(api.mails.getUnapprovedMails)?.sort((a,b)=>{
+    return new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime();
+  })
 
   // Get job and job update data for the selected mail
   const existingJob = useQuery(
@@ -605,8 +607,9 @@ const JobEditor = () => {
                           <SelectContent>
                             {mails.map((mail) => (
                               <SelectItem key={mail._id} value={mail._id}>
-                                {mail.companyName || "Unknown"}:{" "}
-                                {mail.classification} ({mail.reason})
+                    {/* {mail.companyName || "Unknown"}:{" "}
+                                {mail.classification} ({mail.reason}) */}
+                                {mail.subject}{new Date(mail._creationTime).toLocaleString()}
                               </SelectItem>
                             ))}
                           </SelectContent>

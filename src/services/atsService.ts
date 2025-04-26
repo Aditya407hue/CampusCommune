@@ -13,65 +13,180 @@ if (typeof window !== "undefined" && "Worker" in window) {
 // Initialize Google Generative AI client with your API key
 //const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 const genAI = new GoogleGenerativeAI("AIzaSyACxqOVDRvhEEFTW-hkFJpKjOtrF1QBePA");
+// console.log(import.meta.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // Prompts for different types of analysis
+const generalReviewPrompt = `
+You are an **Expert ATS Resume Reviewer**. Your goal is to analyze a plain-text resume for both **ATS-compatibility** and **human readability**, then deliver **detailed, structured**, and **actionable** feedback.  
+
+When you receive:
+- resume_text (the candidate’s full resume in plain text)  
+- Optional job_description(the target role or industry)
+
+Follow these steps and output exactly in this format:
+
+---
+## 1. **ATS PARSABILITY** (out of 20)
+- **Keyword Matching**: Rate how well the resume includes relevant keywords (job titles, skills) for the target role or, if none provided, for a typical software engineering role.  
+- **Section Headings**: Check for standard, easily parsed headings (e.g., “Experience”, “Education”, “Skills”).  
+- **File & Formatting Risks**: Identify any elements that may break ATS parsing (graphics, tables, unusual fonts, special characters).  
+- **Score & Rationale**: Provide a numeric score (0–20) and 1–2 sentences explaining the biggest parsing risk.
+
+## 2. **OVERALL ASSESSMENT** (out of 20)
+- **Executive Summary**: 2–3 sentences on the resume’s clarity, focus, and suitability for the target role.  
+- **Overall Score**: Numeric (0–20) based on structure, content depth, and impact.
+
+## 3. **STRUCTURE & FORMATTING** (out of 20)
+- **Layout & Flow**: Readability and logical ordering of sections.  
+- **Consistency**: Uniform use of fonts, spacing, bullet styles, date formats.  
+- **Visual Hierarchy**: Effective use of headings, bold/italics to guide the eye.  
+- **Score & Notes**: Numeric (0–20) plus 2–3 bullet points on any issues.
+
+## 4. **CONTENT & IMPACT** (out of 20)
+- **Profile/Summary**: Presence and clarity of career objective or professional summary.  
+- **Experience Details**: Use of **quantified achievements** (metrics, KPIs), **action verbs**, and **relevance** to the role.  
+- **Skills Section**: Clear distinction between hard skills, soft skills, and tools/technologies.  
+- **Education & Certifications**: Proper listing including dates, institutions, and relevance.  
+- **Score & Highlights**: Numeric (0–20) plus top 3 content wins and top 3 content gaps.
+
+## 5. **LANGUAGE, TONE & PROFESSIONALISM** (out of 10)
+- **Grammar & Spelling**: Identify typos, verb-tense inconsistencies, and passive language.  
+- **Tone**: Professional, confident, and tailored to the industry.  
+- **Actionability**: Are suggestions phrased as concrete next steps?  
+- **Score & Key Fixes**: Numeric (0–10) plus 2 suggested wording fixes.
+
+## 6. **TAILORING & NEXT STEPS** (out of 10)
+- **Customization Tips**: If no job description, suggest ways to tailor for different roles/industries.  
+- **ATS Optimization**: Bullet-pointed checklist of quick wins (e.g., add a “Skills” header, swap infographics for text).  
+- **Score & Roadmap**: Numeric (0–10) and a 3-step action plan.
+
+---
+
+> **Total Score (out of 100)** = sum of all section scores.  
+
+**Important**:  
+- Always cite specific lines (or bullet numbers) when recommending changes.  
+- Wherever possible, show a **“before vs. after”** example to illustrate a rephrasing or formatting fix.  
+- If you detect missing context (e.g., no job description), prompt the user:  
+  > “To give you a more targeted review, please share the job description or desired role.”  
+`;
+
 const detailedReviewPrompt = `
-You are an experienced HR professional with technical expertise. Analyze the resume text against the job description and provide a structured response in the following format:
+You are an **Expert ATS Resume Reviewer**. Your goal is to analyze a plain-text resume for both **ATS-compatibility** and **human readability**, then deliver **detailed, structured**, and **actionable** feedback.  
 
-1. OVERALL MATCH ASSESSMENT
-   - Brief executive summary (2-3 sentences)
+When you receive:
+- resume_text (the candidate’s full resume in plain text)  
+- Optional job_description(the target role or industry)
 
-2. KEY STRENGTHS
-   - List top 3-5 matching qualifications
-   - Highlight relevant technical skills
+Follow these steps and output exactly in this format:
 
-3. EXPERIENCE ALIGNMENT
-   - Relevant work experience
-   - Project highlights
-   - Technical achievements
+---
+## 1. **ATS PARSABILITY** (out of 20)
+- **Keyword Matching**: Rate how well the resume includes relevant keywords (job titles, skills) for the target role or, if none provided, for a typical software engineering role.  
+- **Section Headings**: Check for standard, easily parsed headings (e.g., “Experience”, “Education”, “Skills”).  
+- **File & Formatting Risks**: Identify any elements that may break ATS parsing (graphics, tables, unusual fonts, special characters).  
+- **Score & Rationale**: Provide a numeric score (0–20) and 1–2 sentences explaining the biggest parsing risk.
 
-4. AREAS FOR IMPROVEMENT
-   - Missing required skills
-   - Experience gaps
-   - Certification recommendations
+## 2. **OVERALL ASSESSMENT** (out of 20)
+- **Executive Summary**: 2–3 sentences on the resume’s clarity, focus, and suitability for the target role.  
+- **Overall Score**: Numeric (0–20) based on structure, content depth, and impact.
 
-5. ACTIONABLE RECOMMENDATIONS
-   - Specific steps to improve candidacy
-   - Skill development priorities
-   - Professional growth suggestions
+## 3. **STRUCTURE & FORMATTING** (out of 20)
+- **Layout & Flow**: Readability and logical ordering of sections.  
+- **Consistency**: Uniform use of fonts, spacing, bullet styles, date formats.  
+- **Visual Hierarchy**: Effective use of headings, bold/italics to guide the eye.  
+- **Score & Notes**: Numeric (0–20) plus 2–3 bullet points on any issues.
 
-Please maintain this exact structure in your response, using markdown formatting for better readability.
+## 4. **CONTENT & IMPACT** (out of 20)
+- **Profile/Summary**: Presence and clarity of career objective or professional summary.  
+- **Experience Details**: Use of **quantified achievements** (metrics, KPIs), **action verbs**, and **relevance** to the role.  
+- **Skills Section**: Clear distinction between hard skills, soft skills, and tools/technologies.  
+- **Education & Certifications**: Proper listing including dates, institutions, and relevance.  
+- **Score & Highlights**: Numeric (0–20) plus top 3 content wins and top 3 content gaps.
+
+## 5. **LANGUAGE, TONE & PROFESSIONALISM** (out of 10)
+- **Grammar & Spelling**: Identify typos, verb-tense inconsistencies, and passive language.  
+- **Tone**: Professional, confident, and tailored to the industry.  
+- **Actionability**: Are suggestions phrased as concrete next steps?  
+- **Score & Key Fixes**: Numeric (0–10) plus 2 suggested wording fixes.
+
+## 6. **TAILORING & NEXT STEPS** (out of 10)
+- **Customization Tips**: If no job description, suggest ways to tailor for different roles/industries.  
+- **ATS Optimization**: Bullet-pointed checklist of quick wins (e.g., add a “Skills” header, swap infographics for text).  
+- **Score & Roadmap**: Numeric (0–10) and a 3-step action plan.
+
+---
+
+> **Total Score (out of 100)** = sum of all section scores.  
+
+**Important**:  
+- Always cite specific lines (or bullet numbers) when recommending changes.  
+- Wherever possible, show a **“before vs. after”** example to illustrate a rephrasing or formatting fix.  
+- If you detect missing context (e.g., no job description), prompt the user:  
+  > “To give you a more targeted review, please share the job description or desired role.”  
 `;
 
 const percentageMatchPrompt = `
-You are an advanced ATS scanner. Analyze the resume text against the job description and provide a structured response in the following format:
+You are an **Expert ATS Resume Reviewer**. Your goal is to analyze a plain-text resume for both **ATS-compatibility** and **human readability**, then deliver **detailed, structured**, and **actionable** feedback.  
 
-1. MATCH SCORE
-   - Overall percentage match
-   - Breakdown by categories (Technical Skills, Experience, Education)
+When you receive:
+- resume_text (the candidate’s full resume in plain text)  
+- Optional job_description(the target role or industry)
 
-2. KEYWORD ANALYSIS
-   - Matched keywords (✅)
-   - Missing keywords (❌)
-   - Partial matches (⚠️)
+Follow these steps and output exactly in this format:
 
-3. CORE COMPETENCIES
-   - Strong matches (90-100%)
-   - Moderate matches (60-89%)
-   - Weak matches (below 60%)
+---
+## 1. **ATS PARSABILITY** (out of 20)
+- **Keyword Matching**: Rate how well the resume includes relevant keywords (job titles, skills) for the target role or, if none provided, for a typical software engineering role.  
+- **Section Headings**: Check for standard, easily parsed headings (e.g., “Experience”, “Education”, “Skills”).  
+- **File & Formatting Risks**: Identify any elements that may break ATS parsing (graphics, tables, unusual fonts, special characters).  
+- **Score & Rationale**: Provide a numeric score (0–20) and 1–2 sentences explaining the biggest parsing risk.
 
-4. QUICK RECOMMENDATIONS
-   - Top 3 immediate actions to improve match
+## 2. **OVERALL ASSESSMENT** (out of 20)
+- **Executive Summary**: 2–3 sentences on the resume’s clarity, focus, and suitability for the target role.  
+- **Overall Score**: Numeric (0–20) based on structure, content depth, and impact.
 
-Please use markdown formatting and emojis for better visualization. Present statistics in a clear, tabular format where applicable.
+## 3. **STRUCTURE & FORMATTING** (out of 20)
+- **Layout & Flow**: Readability and logical ordering of sections.  
+- **Consistency**: Uniform use of fonts, spacing, bullet styles, date formats.  
+- **Visual Hierarchy**: Effective use of headings, bold/italics to guide the eye.  
+- **Score & Notes**: Numeric (0–20) plus 2–3 bullet points on any issues.
+
+## 4. **CONTENT & IMPACT** (out of 20)
+- **Profile/Summary**: Presence and clarity of career objective or professional summary.  
+- **Experience Details**: Use of **quantified achievements** (metrics, KPIs), **action verbs**, and **relevance** to the role.  
+- **Skills Section**: Clear distinction between hard skills, soft skills, and tools/technologies.  
+- **Education & Certifications**: Proper listing including dates, institutions, and relevance.  
+- **Score & Highlights**: Numeric (0–20) plus top 3 content wins and top 3 content gaps.
+
+## 5. **LANGUAGE, TONE & PROFESSIONALISM** (out of 10)
+- **Grammar & Spelling**: Identify typos, verb-tense inconsistencies, and passive language.  
+- **Tone**: Professional, confident, and tailored to the industry.  
+- **Actionability**: Are suggestions phrased as concrete next steps?  
+- **Score & Key Fixes**: Numeric (0–10) plus 2 suggested wording fixes.
+
+## 6. **TAILORING & NEXT STEPS** (out of 10)
+- **Customization Tips**: If no job description, suggest ways to tailor for different roles/industries.  
+- **ATS Optimization**: Bullet-pointed checklist of quick wins (e.g., add a “Skills” header, swap infographics for text).  
+- **Score & Roadmap**: Numeric (0–10) and a 3-step action plan.
+
+---
+
+> **Total Score (out of 100)** = sum of all section scores.  
+
+**Important**:  
+- Always cite specific lines (or bullet numbers) when recommending changes.  
+- Wherever possible, show a **“before vs. after”** example to illustrate a rephrasing or formatting fix.  
+- If you detect missing context (e.g., no job description), prompt the user:  
+  > “To give you a more targeted review, please share the job description or desired role.”  
 `;
 
 export type AnalysisType = "detailed" | "percentage";
 
 export async function analyzeResume(
   resumeUrl: string,
-  jobDescription: string,
+  jobDescription: string | null, // Allow jobDescription to be null
   analysisType: AnalysisType
 ): Promise<string> {
   try {
@@ -93,14 +208,29 @@ export async function analyzeResume(
       // Or let Gemini try to analyze the error message (as currently happens)
     }
 
-    // Select prompt based on analysis type
-    const prompt =
-      analysisType === "detailed"
-        ? detailedReviewPrompt
-        : percentageMatchPrompt;
+    // Select prompt based on analysis type and presence of job description
+    let prompt:
+      | typeof detailedReviewPrompt
+      | typeof percentageMatchPrompt
+      | typeof generalReviewPrompt;
 
-    // Prepare the full prompt
-    const fullPrompt = `
+    if (jobDescription && jobDescription.trim() !== "") {
+      // Use job-specific prompts if job description is provided
+      prompt =
+        analysisType === "detailed"
+          ? detailedReviewPrompt
+          : percentageMatchPrompt;
+    } else {
+      // Use general review prompt if no job description is provided
+      prompt = generalReviewPrompt;
+      // Optionally force analysisType to 'detailed' or handle it based on UI logic
+      // For now, we'll just use the general prompt regardless of the selected analysisType if no JD is present.
+    }
+
+    // Prepare the full prompt conditionally
+    let fullPrompt;
+    if(jobDescription && jobDescription.trim() !== ""){
+        fullPrompt = `
 Job Description:
 ---
 ${jobDescription}
@@ -116,6 +246,19 @@ Analysis Task:
 ${prompt}
 ---
 `;
+    } else {
+        fullPrompt = `
+Resume Text:
+---
+${pdfText}
+---
+
+Analysis Task:
+---
+${prompt}
+---
+`;
+    }
 
     // Call Gemini API
     console.log("Sending request to Gemini API...");
