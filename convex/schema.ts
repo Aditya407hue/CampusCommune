@@ -101,6 +101,7 @@ const applicationTables = {
     noOfAttachments: v.number(),
     attachmentLinks: v.array(v.string()),
     companyName: v.optional(v.union(v.string(), v.null())),
+    subject: v.optional(v.union(v.string(), v.null())),
     classification: v.string(),
     reason: v.string(),
     isApproved: v.boolean(),

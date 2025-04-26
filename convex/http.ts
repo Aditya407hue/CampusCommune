@@ -27,6 +27,7 @@ http.route({
         !data.mailContent ||
         !Array.isArray(data.attachmentLinks) ||
         !data.classification ||
+        !data.subject ||
         !data.reason
       ) {
         return new Response(
@@ -41,8 +42,10 @@ http.route({
 
       // Call the internal mutation to save the mail
       const mailId = await ctx.runMutation(api.mails.create, {
+        subject: data.subject,
+        companyName: data.companyName,
         mailContent: data.mailContent,
-        attachmentLinks: data.attachmentLinks, // Assuming make.com sends an array of strings
+        attachmentLinks: data.attachmentLinks,
         classification: data.classification,
         reason: data.reason,
       });
@@ -262,5 +265,4 @@ http.route({
   }),
 });
 
-// Convex expects the router to be the default export of `convex/http.js`.
 export default http;
