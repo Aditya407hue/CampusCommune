@@ -79,7 +79,7 @@ const applicationTables = {
       v.literal("accepted")
     ),
     appliedAt: v.number(),
-    resumeFileId: v.optional(v.union(v.id("_storage"),v.null())),
+    resumeFileId: v.optional(v.union(v.id("_storage"), v.null())),
   })
     .index("by_student", ["studentId"])
     .index("by_job", ["jobId"]),
@@ -89,12 +89,23 @@ const applicationTables = {
     type: v.union(
       v.literal("new_job"),
       v.literal("status_update"),
-      v.literal("deadline_reminder")
+      v.literal("deadline_reminder"),
+      v.literal("job_update"),
+      v.literal("mail_approval"),
+      v.literal("application_status_change"),
+      v.literal("new_application")
     ),
     message: v.string(),
     read: v.boolean(),
     createdAt: v.number(),
-  }).index("by_user_unread", ["userId", "read"]),
+    relatedId: v.optional(
+      v.union(v.id("jobs"), v.id("applications"), v.id("mails"), v.null())
+    ),
+    actionUrl: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_unread", ["userId", "read"])
+    .index("by_user_date", ["userId", "createdAt"]),
 
   mails: defineTable({
     mailContent: v.string(),
@@ -112,7 +123,9 @@ const applicationTables = {
     summary: v.optional(v.union(v.string(), v.null())),
     mailId: v.id("mails"),
     jobId: v.id("jobs"),
-  }).index("by_mailId", ["mailId"]),
+  })
+    .index("by_mailId", ["mailId"])
+    .index("by_jobId", ["jobId"]),
 };
 
 export default defineSchema({

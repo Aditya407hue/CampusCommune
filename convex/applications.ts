@@ -19,6 +19,10 @@ export const apply = mutation({
       .unique();
     if (existing) throw new Error("Already applied");
 
+    // Get job details for notification
+    const job = await ctx.db.get(args.jobId);
+    if (!job) throw new Error("Job not found");
+
     // Create application
     const applicationId = await ctx.db.insert("applications", {
       jobId: args.jobId,
@@ -31,10 +35,31 @@ export const apply = mutation({
     await ctx.db.insert("notifications", {
       userId,
       type: "status_update",
-      message: "Application submitted successfully",
+      message: `Application submitted for ${job.title || "Untitled Job"} at ${job.company || "Unknown Company"}`,
       read: false,
       createdAt: Date.now(),
+      relatedId: applicationId,
+      actionUrl: `/applications`,
     });
+
+    // Find admins to notify about new applications
+    const adminProfiles = await ctx.db
+      .query("profiles")
+      .filter((q) => q.eq(q.field("role"), "admin"))
+      .collect();
+
+    // Notify admins about new application
+    for (const adminProfile of adminProfiles) {
+      await ctx.db.insert("notifications", {
+        userId: adminProfile.userId,
+        type: "new_application",
+        message: `New application received for ${job.title || "Untitled Job"}`,
+        read: false,
+        createdAt: Date.now(),
+        relatedId: applicationId,
+        actionUrl: `/applications`,
+      });
+    }
 
     return applicationId;
   },
@@ -64,6 +89,10 @@ export const updateStatus = mutation({
     const application = await ctx.db.get(args.applicationId);
     if (!application) throw new Error("Application not found");
 
+    // Get job details for notification
+    const job = await ctx.db.get(application.jobId);
+    if (!job) throw new Error("Job not found");
+
     // Update status
     await ctx.db.patch(args.applicationId, {
       status: args.status,
@@ -72,10 +101,12 @@ export const updateStatus = mutation({
     // Create notification for student
     await ctx.db.insert("notifications", {
       userId: application.studentId,
-      type: "status_update",
-      message: `Your application status has been updated to ${args.status}`,
+      type: "application_status_change",
+      message: `Your application status for ${job.title || "Untitled Job"} has been updated to ${args.status}`,
       read: false,
       createdAt: Date.now(),
+      relatedId: args.applicationId,
+      actionUrl: `/applications`,
     });
   },
 });
@@ -116,7 +147,7 @@ export const getById = query({
       .query("profiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-    
+
     if (profile?.role !== "admin" && application.studentId !== userId) {
       throw new Error("Not authorized");
     }

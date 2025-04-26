@@ -3,7 +3,7 @@ import Lottie from "react-lottie";
 import logoAnimation from "@/lottiefiles/create-acc.json";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Bell, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SignOutButton } from "@/SignOutButton";
 import { useState } from "react";
+import { NotificationDropdown } from "@/components/ui/notification-dropdown";
 
 const Navbar = () => {
   const location = useLocation();
@@ -95,14 +96,8 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative hover:bg-gray-100 text-gray-600"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
-            </Button>
+            {/* Replace the bell button with our notification dropdown */}
+            <NotificationDropdown />
 
             {showPostJob && (
               <Button
@@ -160,6 +155,14 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4">
             <nav className="flex flex-col space-y-2">
+              {/* Add notification bell in mobile menu */}
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-sm font-medium text-gray-600">
+                  Notifications
+                </span>
+                <NotificationDropdown />
+              </div>
+
               {navItems.map((item) => (
                 <Link
                   key={item.href}

@@ -79,3 +79,50 @@ export const deleteJobUpdate = mutation({
     return await ctx.db.delete(jobUpdateId);
   },
 });
+
+// New function to get updates for a specific job
+export const getUpdatesForJob = query({
+  args: {
+    jobId: v.id("jobs"),
+  },
+  handler: async (ctx, args) => {
+    const { jobId } = args;
+
+    // Get all updates for this job
+    const jobUpdates = await ctx.db
+      .query("jobUpdates")
+      .withIndex("by_jobId", (q) => q.eq("jobId", jobId))
+      .collect();
+
+    // For each job update, fetch the associated mail details
+    const updatesWithMailInfo = await Promise.all(
+      jobUpdates.map(async (update) => {
+        const mail = update.mailId ? await ctx.db.get(update.mailId) : null;
+        return {
+          ...update,
+          mail,
+        };
+      })
+    );
+
+    // Sort updates by creation time (newest first)
+    return updatesWithMailInfo.sort(
+      (a, b) => b._creationTime - a._creationTime
+    );
+  },
+});
+
+// New function to get all job updates across all jobs
+export const getAllJobUpdates = query({
+  args: {},
+  handler: async (ctx) => {
+    // Get the authenticated user
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    // Get all job updates
+    const jobUpdates = await ctx.db.query("jobUpdates").collect();
+
+    return jobUpdates;
+  },
+});
