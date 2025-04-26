@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Toggle } from "@/components/ui/toggle";
 import { Edit, View, FileText, Bell, Plus, Send } from "lucide-react";
 import { TextViewer } from "@/components/JobEditor/TextViewer";
@@ -12,25 +12,86 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Id } from "convex/_generated/dataModel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
+// Interfaces and constants
 interface Mail {
   _id: Id<"mails">;
   _creationTime: number;
-  subject: string;
-  body: string;
+  mailContent: string;
+  companyName?: string | null;
+  classification: string;
+  reason: string;
+  isApproved: boolean;
+}
+
+interface Job {
+  _id?: Id<"jobs">;
+  title?: string | null;
+  company?: string | null;
+  description?: string | null;
+  location?: string | null;
+  type?: "full-time" | "part-time" | "internship" | "trainee";
+  skills?: string[];
+  salary?: {
+    stipend?: string | null;
+    postConfirmationCTC?: string | null;
+  } | null;
+  deadline?: string | null;
+  isActive?: boolean;
+  createdBy?: Id<"users">;
+  applicationLink?: string[] | null;
+  moreDetails?: {
+    eligibility?: string | null;
+    selectionProcess?: string[];
+    serviceAgreement?: string | null;
+    training?: string | null;
+    joiningDate?: string | null;
+    requiredDocuments?: string | null;
+    companyWebsite?: string | null;
+  } | null;
+  mailId: Id<"mails">;
+}
+
+interface JobUpdateType {
+  _id?: Id<"jobUpdates">;
+  summary?: string | null;
+  mailId: Id<"mails">;
+  jobId?: Id<"jobs">;
+  companyName?: string;
+}
+
+interface UserProfile {
+  _id: Id<"profiles">;
+  userId: Id<"users">;
+  role: "student" | "admin" | "pr";
+  name: string;
+  department: string;
+  graduationYear: number;
+  skills: string[];
+  resumeFileId?: Id<"_storage">;
 }
 
 const sampleText =
   "Welcome to the Job Editor!\n\nThis is a sample text that demonstrates how new lines work.\nYou can edit the JSON on the right side.\n\nThe editor supports:\n- View mode\n- Edit mode\n- JSON validation\n- Easy formatting";
 
-// Initial data for new job posting with correct types
 const initialJobData = {
   title: "",
   company: "",
@@ -56,7 +117,6 @@ const initialJobData = {
   mailId: "" as Id<"mails">,
 };
 
-// Initial data for job update with correct types
 const initialJobUpdateData = {
   companyName: "",
   summary: "",
@@ -68,45 +128,176 @@ const JOB_TYPES = {
   JOB_UPDATE: "job_update",
 } as const;
 
+// Classification to job type mapping
+const CLASSIFICATION_TO_TYPE = {
+  "New Job": JOB_TYPES.NEW_JOB,
+  "Job Posting": JOB_TYPES.NEW_JOB,
+  Recruitment: JOB_TYPES.NEW_JOB,
+  Internship: JOB_TYPES.NEW_JOB,
+  Update: JOB_TYPES.JOB_UPDATE,
+  "Deadline Extension": JOB_TYPES.JOB_UPDATE,
+  "Process Update": JOB_TYPES.JOB_UPDATE,
+  "Interview Schedule": JOB_TYPES.JOB_UPDATE,
+};
+
+// Function to get current user profile
+const useCurrentUserProfile = () => {
+  const { isAuthenticated } = useConvexAuth();
+  const userProfile = useQuery(api.users.getProfile);
+  const userId = userProfile?.userId;
+  return {
+    isAuthenticated,
+    userId,
+    userProfile,
+  };
+};
+
 const JobEditor = () => {
   const [isEditMode, setIsEditMode] = useState(true);
   const [jobType, setJobType] = useState<string>(JOB_TYPES.NEW_JOB);
-  const [jobData, setJobData] = useState(initialJobData);
-  const [jobUpdateData, setJobUpdateData] = useState(initialJobUpdateData);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedMailId, setSelectedMailId] = useState<Id<"mails"> | "">("");
+  const [jobFormData, setJobFormData] = useState<Partial<Job>>(initialJobData);
+  const [jobUpdateFormData, setJobUpdateFormData] =
+    useState<any>(initialJobUpdateData);
+
+  // Track connection state
+  const [connectionState, setConnectionState] = useState<{
+    hasJob: boolean;
+    hasJobUpdate: boolean;
+    originalType: string | null;
+  }>({
+    hasJob: false,
+    hasJobUpdate: false,
+    originalType: null,
+  });
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated, userId, userProfile } = useCurrentUserProfile();
 
-  // Memoize empty mails array to prevent unnecessary re-renders
-  const mails = useMemo<Mail[]>(() => [], []);
+  // Get mail data
+  const mails = useQuery(api.mails.getUnapprovedMails);
 
-  // Mutations for saving data
+  // Get job and job update data for the selected mail
+  const existingJob = useQuery(
+    api.jobs.getJobByMailId,
+    selectedMailId !== "" ? { mailId: selectedMailId } : "skip"
+  );
+
+  const existingJobUpdates = useQuery(
+    api.jobUpdates.getJobUpdateByMailId,
+    selectedMailId !== "" ? { mailId: selectedMailId } : "skip"
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Mutations for CRUD operations
   const createJob = useMutation(api.jobs.create);
   const createJobUpdate = useMutation(api.jobUpdates.create);
+  const updateJobData = useMutation(api.jobs.update);
+  const updateJobUpdateData = useMutation(api.jobUpdates.update);
+  const deleteJob = useMutation(api.jobs.deleteJob);
+  const deleteJobUpdate = useMutation(api.jobUpdates.deleteJobUpdate);
+  const approveMail = useMutation(api.mails.approveMail);
+  // When a mail is selected, determine what connections it has and update state
+  useEffect(() => {
+    if (!selectedMailId) return;
+
+    console.log(selectedMailId);
+    setIsLoading(true);
+
+    if (existingJob === undefined || existingJobUpdates === undefined) return;
+
+    const selectedMail = mails?.find((mail) => mail._id === selectedMailId);
+    const hasJob = Boolean(existingJob);
+    console.log(existingJob);
+    const hasJobUpdate = Boolean(
+      existingJobUpdates && existingJobUpdates.length > 0
+    );
+    console.log(existingJobUpdates);
+
+    console.log(hasJob, hasJobUpdate);
+
+    setIsLoading(false);
+
+    // Update connection state
+    setConnectionState({
+      hasJob,
+      hasJobUpdate,
+      originalType: hasJob
+        ? JOB_TYPES.NEW_JOB
+        : hasJobUpdate
+          ? JOB_TYPES.JOB_UPDATE
+          : null,
+    });
+
+    // If connection exists, keep the existing type and data
+    if (hasJob) {
+      setJobType(JOB_TYPES.NEW_JOB);
+      // Populate job form data
+      if (existingJob) {
+        setJobFormData({
+          ...existingJob,
+        });
+      }
+    } else if (hasJobUpdate) {
+      setJobType(JOB_TYPES.JOB_UPDATE);
+      // Populate job update form data
+      if (existingJobUpdates && existingJobUpdates.length > 0) {
+        const jobUpdate = existingJobUpdates[0];
+        setJobUpdateFormData({
+          ...jobUpdate,
+          companyName: existingJob?.company || "",
+        });
+      }
+    }
+    // If no connection exists, automatically determine type based on classification
+    else if (selectedMail) {
+      // Set job type based on mail classification if mapping exists
+      const classification = selectedMail.classification;
+
+      // Auto-detect job type based on classification
+      const autoDetectedType =
+        CLASSIFICATION_TO_TYPE[
+          classification as keyof typeof CLASSIFICATION_TO_TYPE
+        ] ||
+        (classification.toLowerCase().includes("update") ||
+        classification.toLowerCase().includes("deadline")
+          ? JOB_TYPES.JOB_UPDATE
+          : JOB_TYPES.NEW_JOB);
+
+      setJobType(autoDetectedType);
+
+      if (autoDetectedType === JOB_TYPES.NEW_JOB) {
+        setJobFormData({
+          ...initialJobData,
+          company: selectedMail.companyName || "",
+          mailId: selectedMailId,
+        });
+      } else {
+        setJobUpdateFormData({
+          ...initialJobUpdateData,
+          companyName: selectedMail.companyName || "",
+          mailId: selectedMailId,
+        });
+      }
+    }
+  }, [selectedMailId, existingJob, existingJobUpdates, mails]);
 
   // Handle data changes based on job type
-  const handleDataChange = (data: any) => {
-    if (jobType === JOB_TYPES.NEW_JOB) {
-      setJobData(data);
-    } else {
-      setJobUpdateData(data);
-    }
+  const handleJobFormDataChange = (data: any) => {
+    setJobFormData((prev) => ({ ...prev, ...data }));
   };
 
-  // Set sample mail ID when mails are loaded
-  useEffect(() => {
-    if (mails.length > 0) {
-      setJobData((prev) => ({ ...prev, mailId: mails[0]._id }));
-      setJobUpdateData((prev) => ({ ...prev, mailId: mails[0]._id }));
-    }
-  }, [mails]);
+  const handleJobUpdateFormDataChange = (data: any) => {
+    setJobUpdateFormData((prev: any) => ({ ...prev, ...data }));
+  };
 
   // Validate form data before saving
   const validateForm = () => {
     if (jobType === JOB_TYPES.NEW_JOB) {
       // Basic validation for job posting
-      if (!jobData.title) {
+      if (!jobFormData.title) {
         toast({
           title: "Validation error",
           description: "Job title is required",
@@ -115,7 +306,7 @@ const JobEditor = () => {
         return false;
       }
 
-      if (!jobData.company) {
+      if (!jobFormData.company) {
         toast({
           title: "Validation error",
           description: "Company name is required",
@@ -124,7 +315,7 @@ const JobEditor = () => {
         return false;
       }
 
-      if (!jobData.mailId) {
+      if (!selectedMailId) {
         toast({
           title: "Validation error",
           description: "Mail ID is required",
@@ -134,7 +325,7 @@ const JobEditor = () => {
       }
     } else {
       // Basic validation for job update
-      if (!jobUpdateData.companyName) {
+      if (!jobUpdateFormData.companyName) {
         toast({
           title: "Validation error",
           description: "Company name is required",
@@ -143,7 +334,7 @@ const JobEditor = () => {
         return false;
       }
 
-      if (!jobUpdateData.summary) {
+      if (!jobUpdateFormData.summary) {
         toast({
           title: "Validation error",
           description: "Summary is required",
@@ -152,7 +343,7 @@ const JobEditor = () => {
         return false;
       }
 
-      if (!jobUpdateData.mailId) {
+      if (!selectedMailId) {
         toast({
           title: "Validation error",
           description: "Mail ID is required",
@@ -165,24 +356,114 @@ const JobEditor = () => {
     return true;
   };
 
-  // Handle save action
+  // Handle save action - now handles all three cases
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !selectedMailId) return;
 
     setIsSaving(true);
 
     try {
-      if (jobType === JOB_TYPES.NEW_JOB) {
-        await createJob(jobData);
-        toast({
-          title: "Success",
-          description: "Job posting created successfully",
-        });
-      } else {
-        await createJobUpdate(jobUpdateData);
-        toast({
-          title: "Success",
-          description: "Job update created successfully",
+      // CASE 1: Update existing (same type)
+      if (
+        (connectionState.hasJob && jobType === JOB_TYPES.NEW_JOB) ||
+        (connectionState.hasJobUpdate && jobType === JOB_TYPES.JOB_UPDATE)
+      ) {
+        if (jobType === JOB_TYPES.NEW_JOB && existingJob) {
+          // Update existing job
+          await updateJobData({
+            jobId: existingJob._id,
+            ...jobFormData,
+          });
+          toast({
+            title: "Success",
+            description: "Job posting updated successfully",
+          });
+        } else if (
+          jobType === JOB_TYPES.JOB_UPDATE &&
+          existingJobUpdates &&
+          existingJobUpdates.length > 0
+        ) {
+          // Update existing job update
+          await updateJobUpdateData({
+            jobUpdateId: existingJobUpdates[0]._id,
+            summary: jobUpdateFormData.summary,
+          });
+          toast({
+            title: "Success",
+            description: "Job update updated successfully",
+          });
+        }
+      }
+      // CASE 2: Change type (delete old, create new)
+      else if (
+        (connectionState.hasJob && jobType === JOB_TYPES.JOB_UPDATE) ||
+        (connectionState.hasJobUpdate && jobType === JOB_TYPES.NEW_JOB)
+      ) {
+        // First delete the existing connection
+        if (connectionState.hasJob && existingJob) {
+          await deleteJob({ jobId: existingJob._id });
+        } else if (
+          connectionState.hasJobUpdate &&
+          existingJobUpdates &&
+          existingJobUpdates.length > 0
+        ) {
+          await deleteJobUpdate({ jobUpdateId: existingJobUpdates[0]._id });
+        }
+
+        // Then create the new type
+        if (jobType === JOB_TYPES.NEW_JOB) {
+          await createJob({
+            ...jobFormData,
+            mailId: selectedMailId,
+          });
+          toast({
+            title: "Success",
+            description: "Changed to job posting successfully",
+          });
+        } else {
+          // Find a job for this company to associate the update with
+          const companyName = jobUpdateFormData.companyName;
+          await createJobUpdate({
+            summary: jobUpdateFormData.summary,
+            mailId: selectedMailId,
+            companyName,
+          });
+          toast({
+            title: "Success",
+            description: "Changed to job update successfully",
+          });
+        }
+      }
+      // CASE 3: Create new (no previous connection)
+      else {
+        if (jobType === JOB_TYPES.NEW_JOB) {
+          await createJob({
+            ...jobFormData,
+            mailId: selectedMailId,
+          });
+          toast({
+            title: "Success",
+            description: "New job posting created successfully",
+          });
+        } else {
+          const companyName = jobUpdateFormData.companyName;
+          await createJobUpdate({
+            summary: jobUpdateFormData.summary,
+            mailId: selectedMailId,
+            companyName,
+          });
+          toast({
+            title: "Success",
+            description: "New job update created successfully",
+          });
+        }
+      }
+
+      // If PR user is processing this mail, mark it as approved
+      if (userProfile?.role === "pr" && selectedMailId) {
+        await approveMail({
+          mailId: selectedMailId,
+          userId: userId as Id<"users">,
         });
       }
 
@@ -202,47 +483,6 @@ const JobEditor = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Hero Section with Gradient Background */}
-      {/* <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-12 px-8 rounded-2xl shadow-lg m-6">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="w-full md:w-1/2 mb-8 md:mb-0">
-              <Button
-                variant="ghost"
-                className="mb-4 text-white hover:text-white/80"
-                onClick={() => void navigate("/jobs")}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Jobs
-              </Button>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                {jobType === JOB_TYPES.NEW_JOB ? (
-                  <>
-                    Create New <span className="text-yellow-300">Job Post</span>
-                  </>
-                ) : (
-                  <>
-                    Post Job <span className="text-yellow-300">Update</span>
-                  </>
-                )}
-              </h1>
-              <p className="text-indigo-100 mb-6 text-lg max-w-xl">
-                {jobType === JOB_TYPES.NEW_JOB
-                  ? "Create a detailed job posting to attract the perfect candidates for your position."
-                  : "Keep candidates informed with important updates about the job posting."}
-              </p>
-            </div>
-            <div className="w-full md:w-1/3 flex justify-center">
-              <Lottie
-                options={createJobAnimationOptions}
-                height={200}
-                width={200}
-              />
-            </div>
-          </div>
-        </div>
-      </div> */}
-
       <main className="container mx-auto px-6 py-8 -mt-6">
         <Card className="mb-8 gap-0 shadow-md bg-white/80 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between p-6">
@@ -326,6 +566,20 @@ const JobEditor = () => {
               </Button>
             </div>
 
+            {/* Connection state indicator */}
+            {selectedMailId &&
+              (connectionState.hasJob || connectionState.hasJobUpdate) && (
+                <div className="mb-6 p-4 border rounded-md bg-blue-50 border-blue-200">
+                  <p className="text-sm text-blue-700 font-medium flex items-center">
+                    <Bell className="h-4 w-4 mr-2" />
+                    This email is currently{" "}
+                    {connectionState.hasJob ? "a job posting" : "a job update"}.
+                    {connectionState.originalType !== jobType &&
+                      " Changing the type will replace the existing entry."}
+                  </p>
+                </div>
+              )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left panel - Email content */}
               <Card className="shadow-sm bg-white/90 backdrop-blur-sm border-0">
@@ -338,46 +592,27 @@ const JobEditor = () => {
                 <CardContent className="p-6">
                   <Card className="bg-gray-50/80 border-0 mb-4">
                     <CardContent className="p-4">
-                      {mails.length > 0 ? (
+                      {mails && mails.length > 0 ? (
                         <Select
-                          value={
-                            jobType === JOB_TYPES.NEW_JOB
-                              ? jobData.mailId.toString()
-                              : jobUpdateData.mailId.toString()
-                          }
+                          value={selectedMailId ? selectedMailId : undefined}
                           onValueChange={(value) => {
-                            if (jobType === JOB_TYPES.NEW_JOB) {
-                              setJobData({
-                                ...jobData,
-                                mailId: value as Id<"mails">,
-                              });
-                            } else {
-                              setJobUpdateData({
-                                ...jobUpdateData,
-                                mailId: value as Id<"mails">,
-                              });
-                            }
+                            setSelectedMailId(value as Id<"mails">);
                           }}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select email template" />
+                            <SelectValue placeholder="Select email" />
                           </SelectTrigger>
                           <SelectContent>
                             {mails.map((mail) => (
                               <SelectItem key={mail._id} value={mail._id}>
-                                {mail.subject || "No subject"} (
-                                {new Date(
-                                  mail._creationTime
-                                ).toLocaleDateString()}
-                                )
+                                {mail.companyName || "Unknown"}:{" "}
+                                {mail.classification} ({mail.reason})
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       ) : (
-                        <p className="text-gray-500">
-                          No email templates available
-                        </p>
+                        <p className="text-gray-500">No emails available</p>
                       )}
                     </CardContent>
                   </Card>
@@ -385,13 +620,10 @@ const JobEditor = () => {
                   <ScrollArea className="h-[calc(100vh-600px)] rounded-lg border bg-white p-4">
                     <TextViewer
                       text={
-                        mails.find(
-                          (mail) =>
-                            mail._id ===
-                            (jobType === JOB_TYPES.NEW_JOB
-                              ? jobData.mailId
-                              : jobUpdateData.mailId)
-                        )?.body || sampleText
+                        (mails &&
+                          mails.find((mail) => mail._id === selectedMailId)
+                            ?.mailContent) ||
+                        sampleText
                       }
                     />
                   </ScrollArea>
@@ -419,14 +651,14 @@ const JobEditor = () => {
                   <ScrollArea className="h-[calc(100vh-600px)]">
                     {jobType === JOB_TYPES.NEW_JOB ? (
                       <JobPostingForm
-                        data={jobData}
-                        onChange={handleDataChange}
+                        data={jobFormData}
+                        onChange={handleJobFormDataChange}
                         isEditMode={isEditMode}
                       />
                     ) : (
                       <JobUpdateForm
-                        data={jobUpdateData}
-                        onChange={handleDataChange}
+                        data={jobUpdateFormData}
+                        onChange={handleJobUpdateFormDataChange}
                         isEditMode={isEditMode}
                       />
                     )}
@@ -447,23 +679,48 @@ const JobEditor = () => {
             >
               Cancel
             </Button>
-            <Button
-              onClick={() => void handleSave()}
-              disabled={isSaving}
-              className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-              size="lg"
-            >
-              {isSaving ? (
-                "Saving..."
-              ) : (
-                <>
-                  <Send className="h-4 w-4" />
-                  {jobType === JOB_TYPES.NEW_JOB
-                    ? "Publish Job"
-                    : "Post Update"}
-                </>
-              )}
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={isSaving || !selectedMailId}
+                  className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  size="lg"
+                >
+                  {isSaving ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      {connectionState.hasJob || connectionState.hasJobUpdate
+                        ? connectionState.originalType === jobType
+                          ? "Update"
+                          : "Change Type & Save"
+                        : jobType === JOB_TYPES.NEW_JOB
+                          ? "Publish Job"
+                          : "Post Update"}
+                    </>
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {connectionState.hasJob || connectionState.hasJobUpdate
+                      ? connectionState.originalType === jobType
+                        ? "Are you sure you want to update this record?"
+                        : "Changing the type will delete the existing record and create a new one. Continue?"
+                      : "Are you sure you want to create this new record?"}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => void handleSave()}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
       </main>

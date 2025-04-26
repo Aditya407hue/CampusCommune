@@ -1,4 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+// Import pdfjs and worker directly
+import * as pdfjs from "pdfjs-dist";
+
+// Set worker properly (this is crucial for Vite-based projects)
+if (typeof window !== "undefined" && "Worker" in window) {
+  pdfjs.GlobalWorkerOptions.workerPort = new Worker(
+    new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url),
+    { type: "module" }
+  );
+}
 
 // Initialize Google Generative AI client with your API key
 //const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
@@ -162,19 +172,11 @@ async function extractTextFromPdfSimple(pdfBlob: Blob): Promise<string> {
   try {
     const arrayBuffer = await pdfBlob.arrayBuffer();
 
-    // Import PDF.js - using dynamic import
-    const pdfjsLib = await import("pdfjs-dist");
-
-    // Set worker source using CDN for reliability
-    // Ensure this URL is accessible from your environment
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-
-    // Log version for debugging
-    console.log("Using PDF.js version:", pdfjsLib.version);
-    console.log("Worker source:", pdfjsLib.GlobalWorkerOptions.workerSrc);
+    // We're now using the directly imported pdfjs instead of dynamic import
+    console.log("Using PDF.js version:", pdfjs.version);
 
     // Load document with better error handling
-    const loadingTask = pdfjsLib.getDocument({
+    const loadingTask = pdfjs.getDocument({
       data: arrayBuffer,
       useWorkerFetch: false,
       isEvalSupported: true,
@@ -182,7 +184,7 @@ async function extractTextFromPdfSimple(pdfBlob: Blob): Promise<string> {
     });
 
     // Add progress logging
-    loadingTask.onProgress = (data) => {
+    loadingTask.onProgress = (data: any) => {
       if (data.total > 0) {
         console.log(
           `Loading PDF: ${Math.round((100 * data.loaded) / data.total)}%`
@@ -213,7 +215,7 @@ async function extractTextFromPdfSimple(pdfBlob: Blob): Promise<string> {
             console.log(`Processing page ${pageNum}/${pdf.numPages}`);
             const page = await pdf.getPage(pageNum);
             // Add timeout for text extraction per page
-            const textContent = (await Promise.race([
+            const textContent = await Promise.race([
               page.getTextContent(),
               new Promise(
                 (_, reject) =>
@@ -227,7 +229,7 @@ async function extractTextFromPdfSimple(pdfBlob: Blob): Promise<string> {
                     10000
                   ) // 10s timeout per page
               ),
-            ])) as any; // Using 'as any' for simplicity with TextContent type
+            ]); // Using 'as any' for simplicity with TextContent type
 
             // More robust filtering and joining
             if (textContent && Array.isArray(textContent.items)) {
