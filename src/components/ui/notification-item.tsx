@@ -59,7 +59,7 @@ export function NotificationItem({
           ? "bg-white hover:bg-gray-50"
           : "bg-blue-50 hover:bg-blue-100"
       )}
-      onClick={() => handleClick}
+      onClick={() => handleClick()}
     >
       <div className="mt-0.5">{getIcon()}</div>
       <div className="flex-1 min-w-0">
