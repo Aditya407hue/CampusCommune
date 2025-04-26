@@ -7,7 +7,7 @@ export function ApplicationsView({ isAdmin }: { isAdmin: boolean }) {
   const applicationsWithJobs = useQuery(api.applications.listByStudent) ?? [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 px-12">
       <Applications applications={applicationsWithJobs} />
     </div>
   );

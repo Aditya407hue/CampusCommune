@@ -4,6 +4,7 @@ import { Search, ArrowDownCircle, ChevronDown } from "lucide-react";
 import animationData from "@/lottiefiles/search-lottie.json";
 import flybusinessman from "@/lottiefiles/flying-businessman.json";
 import Lottie from "react-lottie";
+import { useNavigate } from "react-router-dom";
 
 interface HeroSectionProps {
   scrollToSection?: (id: string) => void;
@@ -33,6 +34,7 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
       scrollToSection("featured-jobs");
     }
   };
+  const navigate=useNavigate();
 
   return (
     <section className="relative bg-gradient-to-r from-blue-300 to-emerald-300 pt-16 pb-20 md:pb-32 overflow-hidden">
@@ -71,10 +73,10 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
                 <Input
                   type="text"
                   placeholder="Job title, keywords, or company"
-                  className="pl-10 h-12 w-full bg-white border-0 focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="pl-10 h-12 w-full bg-white text-black border-0 focus-visible:ring-2 focus-visible:ring-indigo-500"
                 />
               </div>
-              <Button className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200">
+              <Button className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={()=>navigate("/jobs ")}>
                 Search Jobs
               </Button>
             </div>
@@ -83,7 +85,7 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
               <Button
                 variant="outline"
                 onClick={handleScrollToFeaturedJobs}
-                className="text-white border-white/30 hover:bg-white/10 gap-2 group bg-gradient-to-r text-white from-indigo-600 to-purple-600"
+                className="text-white border-white/30 hover:bg-white/10 gap-2 group bg-gradient-to-r text-white from-indigo-600 to-purple-600 cursor-pointer"
               >
                 <span>Explore jobs</span>
                 <ChevronDown className="h-4 w-4 group-hover:translate-y-1 transition-transform" />

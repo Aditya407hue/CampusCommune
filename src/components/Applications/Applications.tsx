@@ -138,7 +138,7 @@ const Applications = ({
       */}
 
       {/* Blue header bar with text only */}
-      <div className="bg-blue-600 py-4 w-full">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-4 w-full">
         <div className="w-full px-6">
           <h1 className="text-2xl font-bold text-white">Your Applications</h1>
         </div>

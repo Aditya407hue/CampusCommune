@@ -142,7 +142,7 @@ const Testimonials = () => {
 
         <div className="flex justify-center mt-16">
           <button
-            className={`group bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-[1.02] hover:shadow-lg text-white font-medium py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center space-x-2 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+            className={` cursor-pointer group bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-[1.02] hover:shadow-lg text-white font-medium py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center space-x-2 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
             style={{ transitionDelay: "500ms" }}
           >
             <span>Join our community</span>

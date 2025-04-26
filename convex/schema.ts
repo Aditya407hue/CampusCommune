@@ -79,7 +79,7 @@ const applicationTables = {
       v.literal("accepted")
     ),
     appliedAt: v.number(),
-    resumeFileId: v.id("_storage"),
+    resumeFileId: v.optional(v.union(v.id("_storage"),v.null())),
   })
     .index("by_student", ["studentId"])
     .index("by_job", ["jobId"]),

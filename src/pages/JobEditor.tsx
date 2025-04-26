@@ -483,6 +483,8 @@ const JobEditor = () => {
     }
   };
 
+  if(userProfile?.role==="student") return null;
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="container mx-auto px-6 py-8 -mt-6">

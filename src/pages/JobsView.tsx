@@ -2,13 +2,6 @@ import SearchInput from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { api } from "../../convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { useQuery } from "convex/react";
@@ -18,13 +11,14 @@ import {
   ListCheckIcon,
   MapPinIcon,
   FilterIcon,
-  TagIcon,
+  Search
 } from "lucide-react";
 import { JobDetailsDialog } from "@/components/JobDetailsDialog";
 import Lottie from "react-lottie";
 import searchLottie from "@/lottiefiles/search-jobs.json";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 export function JobsView({ isAdmin }: { isAdmin: boolean }) {
   const jobs = (useQuery(api.jobs.list, { onlyActive: !isAdmin }) ?? []).sort(
@@ -92,13 +86,13 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
 
     return matchesSearch && matchesFilters;
   });
-
+  const navigate=useNavigate();
   return (
     <>
       <div className="min-h-screen flex flex-col">
         <main className="flex-grow bg-gray-50">
           {/* Hero Section with Gradient Background */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 rounded-2xl shadow-lg p-8">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 rounded-2xl mx-8 mb-4 shadow-lg p-8">
             <div className="container mx-auto px-4">
               <div className="flex flex-col md:flex-row items-center">
                 <div className="w-full md:w-1/2 mb-8 md:mb-0">
@@ -110,7 +104,7 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                     Browse through thousands of opportunities that align with
                     your skills, experience, and career goals.
                   </p>
-                  <div className="max-w-xl">
+                  {/* <div className="max-w-xl">
                     <SearchInput
                       placeholder="Job title, keywords, or company..."
                       value={searchTerm}
@@ -119,7 +113,20 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                       showButton={true}
                       onSearch={() => console.log("Search clicked")}
                     />
-                  </div>
+                  </div> */}
+                   <div className="flex flex-col sm:flex-row w-full max-w-xl gap-4 bg-white/10 backdrop-blur-md p-2 rounded-xl">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Job title, keywords, or company"
+                  className="pl-10 h-12 w-full bg-white text-black border-0 focus-visible:ring-2 focus-visible:ring-indigo-500"
+                />
+              </div>
+              <Button className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={()=> navigate("/jobs ")}>
+                Search Jobs
+              </Button>
+            </div>
                 </div>
                 <div className="w-full md:w-1/2 flex justify-center">
                   <Lottie
@@ -132,7 +139,7 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
             </div>
           </div>
 
-          <div className="container mx-auto px-4 py-8 -mt-6">
+          <div className="container mx-auto max-w-full px-14 py-8 -mt-6">
             {/* Filter Section - Styled Card */}
             <Card className="mb-8 shadow-md bg-white/80 backdrop-blur-sm border-0">
               <CardContent className="p-6">
@@ -199,7 +206,7 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                             filterValues.type === type
                               ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-sm"
                               : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200"
-                          } capitalize`}
+                          } capitalize cursor-pointer`}
                         >
                           {type === "all" ? "All Types" : type}
                         </Button>

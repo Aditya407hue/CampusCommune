@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMutation } from "convex/react";
+import { api } from "./../../../convex/_generated/api";
 
 interface ProfileProps {
   profile: Doc<"profiles"> & {
@@ -37,12 +39,13 @@ interface ProfileProps {
 
 const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
   const [activeItem, setActiveItem] = useState("Profile");
+  const updateProfile=useMutation(api.profile.patch);
 
   // Form state
   const [formData, setFormData] = useState({
     name: profile.name || "",
     email: profile.email || "",
-    bio: profile.bio || "",
+    // bio: profile.bio || "",
     department: profile.department || "",
     graduationYear: profile.graduationYear?.toString() || "",
     skills: profile.skills?.join(", ") || "",
@@ -61,6 +64,14 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
     console.log("Saving profile data:", formData);
     if (setIsEditing) setIsEditing(false);
     // Add mutation call here
+    updateProfile({
+      name: formData.name,
+      // bio: formData.bio,
+      department: formData.department,
+      graduationYear: +formData.graduationYear,
+      role: profile.role,
+      skills: formData.skills.split(",")
+    })
   };
 
   // Calculate profile completion percentage
@@ -68,7 +79,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
     const fields = [
       formData.name,
       formData.email,
-      formData.bio,
+      // formData.bio,
       formData.department,
       formData.graduationYear,
       formData.skills,
@@ -165,7 +176,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
         </div>
 
         {/* Main Content */}
-        <div className="lg:col-span-9">
+        <div className="lg:col-span-9 overflow-scroll">
           <ScrollArea className="max-h-[calc(100vh-150px)]">
             <div className="space-y-6 pr-4">
               <Card className="bg-white border-0 shadow-sm">
@@ -214,7 +225,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
                         type="email"
                         value={formData.email}
                         onChange={handleChange}
-                        disabled={!isEditing}
+                        disabled={true}
                         className={!isEditing ? "bg-gray-50" : ""}
                       />
                       <p className="text-xs text-gray-500">
@@ -265,7 +276,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
                       </p>
                     </div>
 
-                    <div className="space-y-2 md:col-span-2">
+                    {/* <div className="space-y-2 md:col-span-2">
                       <label
                         htmlFor="bio"
                         className="text-sm font-medium text-gray-700 flex items-center gap-2"
@@ -284,7 +295,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
                         Tell others about yourself, your interests, and your
                         achievements
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </CardContent>
               </Card>
@@ -352,7 +363,7 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
                         placeholder="Enter phone number"
                         value={formData.phone}
                         onChange={handleChange}
-                        disabled={!isEditing}
+                        disabled={true}
                         className={!isEditing ? "bg-gray-50" : ""}
                       />
                       <p className="text-xs text-gray-500">

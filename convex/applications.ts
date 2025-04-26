@@ -5,7 +5,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 export const apply = mutation({
   args: {
     jobId: v.id("jobs"),
-    resumeFileId: v.id("_storage"),
+    // resumeFileId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -25,7 +25,6 @@ export const apply = mutation({
       studentId: userId,
       status: "pending",
       appliedAt: Date.now(),
-      resumeFileId: args.resumeFileId,
     });
 
     // Create notification for student

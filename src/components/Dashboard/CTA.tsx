@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 
 export function CTA () {
+  const navigate = useNavigate();
   return (
     <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
       <div className="container mx-auto px-6 md:px-8">
@@ -12,7 +14,7 @@ export function CTA () {
             <p className="text-gray-800 mb-8 text-lg">
               Join thousands of job seekers who have found their dream jobs through FindJobs. Create your profile today and start applying to top companies.
             </p>
-            <Button variant="outline" className="bg-gray-800 text-white hover:bg-gray-700 transition-all duration-200 hover:scale-105 hover:shadow-sm cursor-pointer">
+            <Button variant="outline" className="group bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 hover:scale-105 hover:shadow-sm cursor-pointer" onClick={()=> navigate("/profile")}>
               Create Your Profile
             </Button>
           </div>
@@ -23,7 +25,7 @@ export function CTA () {
               <p className="text-gray-800 mb-6">
                 Looking to hire top talent? Post a job on FindJobs and reach thousands of qualified candidates.
               </p>
-              <Button variant="outline" className="bg-gray-800 text-white hover:bg-gray-700 transition-all duration-200 hover:scale-105 hover:shadow-sm cursor-pointer">
+              <Button variant="outline" className="group bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 hover:scale-105 hover:shadow-sm cursor-pointer" onClick={()=>navigate("/job-editor")}>
                 Post a Job
               </Button>
             </div>

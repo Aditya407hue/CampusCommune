@@ -87,7 +87,7 @@ const FeaturedJobs = () => {
           <Button
             onClick={() => void navigate("/jobs")}
             variant="outline"
-            className="mt-4 md:mt-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2 group"
+            className="mt-4 md:mt-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2 group cursor-pointer"
           >
             <span>Explore All Jobs</span>
             <ArrowRightIcon className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -102,13 +102,13 @@ const FeaturedJobs = () => {
               <Card
                 key={job._id}
                 onClick={() => setSelectedJob(job._id)}
-                className="overflow-hidden bg-white hover:shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-1 border-0 shadow-sm"
+                className="overflow-hidden bg-white hover:shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-1 border-0 shadow-sm justify-between"
               >
                 {/* Colored header strip */}
-                <div className={`h-2 w-full bg-${companyColor}-500`}></div>
+                {/* <div className={`h-2 w-full bg-${companyColor}-500`}></div> */}
 
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
+                  <div className="flex  gap-4 mb-4">
                     <div
                       className={`h-12 w-12 rounded-lg bg-${companyColor}-100 flex items-center justify-center flex-shrink-0`}
                     >
@@ -195,7 +195,7 @@ const FeaturedJobs = () => {
                 <CardFooter className="px-6 pb-6 pt-0">
                   <Button
                     variant="outline"
-                    className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50 mt-2"
+                    className="w-full border-indigo-200 text-indigo-700 bg-indigo-50 cursor-pointer hover:bg-indigo-200 mt-2"
                   >
                     View Details
                   </Button>
