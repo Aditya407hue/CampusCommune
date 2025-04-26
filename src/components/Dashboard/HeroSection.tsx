@@ -35,7 +35,7 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
   };
 
   return (
-    <section className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 pt-16 pb-20 md:pb-32 overflow-hidden">
+    <section className="relative bg-gradient-to-r from-blue-300 to-emerald-300 pt-16 pb-20 md:pb-32 overflow-hidden">
       {/* Background blur circles */}
       <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-blue-500 opacity-20 blur-3xl"></div>
@@ -55,12 +55,12 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               Find a job that suits
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-fuchsia-600">
                 {" "}
                 your interest & skills
               </span>
             </h1>
-            <p className="text-blue-100 mb-8 text-lg md:pr-12 leading-relaxed">
+            <p className=" mb-8 text-lg md:pr-12 leading-relaxed font-bold">
               Discover thousands of job opportunities with all the information
               you need. Your future career starts here.
             </p>
@@ -83,9 +83,9 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
               <Button
                 variant="outline"
                 onClick={handleScrollToFeaturedJobs}
-                className="text-white border-white/30 hover:bg-white/10 gap-2 group"
+                className="text-white border-white/30 hover:bg-white/10 gap-2 group bg-gradient-to-r text-white from-indigo-600 to-purple-600"
               >
-                <span>Explore featured jobs</span>
+                <span>Explore jobs</span>
                 <ChevronDown className="h-4 w-4 group-hover:translate-y-1 transition-transform" />
               </Button>
             </div>
@@ -115,6 +115,7 @@ const HeroSection = ({ scrollToSection }: HeroSectionProps) => {
           className="relative block w-full h-16 md:h-24"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
+          style={{ transform: 'rotate(180deg)' }}
         >
           <path
             d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"

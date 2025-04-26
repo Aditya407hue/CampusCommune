@@ -116,7 +116,7 @@ const Testimonials = () => {
                       </svg>
                     ))}
                   </div>
-                  <p className="text-gray-700 italic text-base md:text-lg">
+                  <p className="text-white italic text-base md:text-lg">
                     "{testimonial.quote}"
                   </p>
                 </div>
@@ -129,10 +129,10 @@ const Testimonials = () => {
                     />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-100">
                       {testimonial.name}
                     </h4>
-                    <p className="text-gray-500 text-sm">{testimonial.title}</p>
+                    <p className="text-white text-sm">{testimonial.title}</p>
                   </div>
                 </div>
               </div>
@@ -142,13 +142,13 @@ const Testimonials = () => {
 
         <div className="flex justify-center mt-16">
           <button
-            className={`bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center space-x-2 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+            className={`group bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-[1.02] hover:shadow-lg text-white font-medium py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center space-x-2 transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
             style={{ transitionDelay: "500ms" }}
           >
             <span>Join our community</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

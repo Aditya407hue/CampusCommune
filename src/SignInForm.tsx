@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserIcon, KeyIcon } from "lucide-react";
 
+
 export function SignInForm() {
   const { signIn } = useAuthActions();
   const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
@@ -37,7 +38,7 @@ export function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center p-6">
+    <div className="min-h-screen  flex items-center justify-center p-6">
       <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-xl border-0">
         <CardContent className="p-6">
           <div className="text-center mb-8">
@@ -117,7 +118,7 @@ export function SignInForm() {
             </div>
           </form>
 
-          <div className="relative my-6">
+          {/* <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
             </div>
@@ -133,7 +134,7 @@ export function SignInForm() {
             onClick={() => void signIn("anonymous")}
           >
             Continue as guest
-          </Button>
+          </Button> */}
         </CardContent>
       </Card>
     </div>

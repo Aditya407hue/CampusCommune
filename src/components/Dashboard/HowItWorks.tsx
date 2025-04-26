@@ -13,7 +13,7 @@ const HowItWorks = () => {
       title: "Create Account",
       description:
         "Sign up and complete your profile with relevant skills and experience.",
-      color: "indigo",
+      color: "red",
     },
     {
       icon: searchJobs,
@@ -75,7 +75,7 @@ const HowItWorks = () => {
             Simple Process
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            How Campus Commune Works
+            How <span className="font-bold  bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Campus Commune</span> Works
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg">
             Our streamlined process helps you find and apply to jobs quickly and
@@ -90,7 +90,7 @@ const HowItWorks = () => {
           {steps.map((step, index) => {
             const delay = index * 200;
             const colorMap: Record<string, string> = {
-              indigo: "bg-indigo-50 border-indigo-100",
+              indigo: "bg-indigo-100 border-indigo-100",
               blue: "bg-blue-50 border-blue-100",
               purple: "bg-purple-50 border-purple-100",
               green: "bg-green-50 border-green-100",
