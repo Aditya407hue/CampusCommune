@@ -19,18 +19,22 @@ import {
   CalendarIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { Doc } from "convex/_generated/dataModel";
+import { Doc, Id } from "convex/_generated/dataModel";
 import Lottie from "react-lottie";
 import applicationLottie from "@/lottiefiles/check-animated.json";
 
 // Define the combined type for application with job details
 type ApplicationWithJob = Doc<"applications"> & { job: Doc<"jobs"> | null };
 
-// Update component props to use the new type
+// Update component props to include renderUpdateButton callback
 const Applications = ({
   applications,
+  onSelectApplication,
+  renderUpdateButton,
 }: {
   applications: ApplicationWithJob[];
+  onSelectApplication?: (application: ApplicationWithJob | undefined) => void;
+  renderUpdateButton?: (jobId: Id<"jobs">) => React.ReactNode;
 }) => {
   // Update state type
   const [selectedApp, setSelectedApp] = useState<
@@ -49,6 +53,14 @@ const Applications = ({
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
+  };
+
+  // Function to handle application selection
+  const handleSelectApp = (application: ApplicationWithJob) => {
+    setSelectedApp(application);
+    if (onSelectApplication) {
+      onSelectApplication(application);
+    }
   };
 
   // Filter applications based on active tab and search term
@@ -112,31 +124,6 @@ const Applications = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Hero Section - Commented out as requested
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-10">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-6 md:mb-0">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                Your Applications
-              </h1>
-              <p className="text-blue-100 max-w-lg">
-                Track and manage all your job applications in one place. Stay
-                updated on your application status.
-              </p>
-            </div>
-            <div className="w-40 h-40">
-              <Lottie
-                options={applicationAnimationOptions}
-                height={160}
-                width={160}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      */}
-
       {/* Blue header bar with text only */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-4 w-full">
         <div className="w-full px-6">
@@ -238,7 +225,7 @@ const Applications = ({
                                 ? "border-l-indigo-600"
                                 : "border-l-transparent"
                             }`}
-                            onClick={() => setSelectedApp(application)}
+                            onClick={() => handleSelectApp(application)}
                           >
                             <CardContent className="p-4">
                               <div className="flex justify-between items-start">
@@ -267,13 +254,15 @@ const Applications = ({
                                   Applied on{" "}
                                   {formatDate(application._creationTime)}
                                 </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-indigo-600 hover:text-indigo-800"
-                                >
-                                  View Details
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-indigo-600 hover:text-indigo-800"
+                                  >
+                                    View Details
+                                  </Button>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
@@ -302,7 +291,12 @@ const Applications = ({
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          {/* Updates button moved to status section */}
+                          {renderUpdateButton &&
+                            selectedApp.job &&
+                            renderUpdateButton(selectedApp.job._id)}
+
                           {selectedApp.status && (
                             <span
                               className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(selectedApp.status).bg} ${getStatusStyle(selectedApp.status).text}`}
@@ -314,7 +308,11 @@ const Applications = ({
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setSelectedApp(undefined)}
+                            onClick={() => {
+                              setSelectedApp(undefined);
+                              if (onSelectApplication)
+                                onSelectApplication(undefined);
+                            }}
                             className="rounded-full hover:bg-gray-100"
                           >
                             <XIcon className="w-4 h-4" />
@@ -436,14 +434,19 @@ const Applications = ({
                           </Card>
                         )}
 
-                      <div className="flex justify-between items-center">
+                      <div className="flex gap-3 justify-between items-center">
                         <Button
                           variant="outline"
                           className="text-sm"
-                          onClick={() => setSelectedApp(undefined)}
+                          onClick={() => {
+                            setSelectedApp(undefined);
+                            if (onSelectApplication)
+                              onSelectApplication(undefined);
+                          }}
                         >
                           Back to Applications
                         </Button>
+
                         <Button variant="gradient" className="text-sm">
                           Contact Employer
                         </Button>

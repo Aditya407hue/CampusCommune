@@ -19,6 +19,7 @@ import type * as http from "../http.js";
 import type * as jobUpdates from "../jobUpdates.js";
 import type * as jobs from "../jobs.js";
 import type * as mails from "../mails.js";
+import type * as notifications from "../notifications.js";
 import type * as profile from "../profile.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   jobUpdates: typeof jobUpdates;
   jobs: typeof jobs;
   mails: typeof mails;
+  notifications: typeof notifications;
   profile: typeof profile;
   storage: typeof storage;
   users: typeof users;

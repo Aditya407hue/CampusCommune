@@ -244,10 +244,7 @@ http.route({
     }
     try {
       // Query your Convex function that returns active jobs
-      const activeJobs: Array<{ company: string }> = await ctx.runQuery(
-        api.jobs.listActiveJobs,
-        {}
-      );
+      const activeJobs = await ctx.runQuery(api.jobs.listActiveCompanies, {});
       const companies = activeJobs.map((job) => job.company);
       return new Response(JSON.stringify({ success: true, companies }), {
         status: 200,

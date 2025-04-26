@@ -177,9 +177,11 @@ const JobEditor = () => {
   const { isAuthenticated, userId, userProfile } = useCurrentUserProfile();
 
   // Get mail data
-  const mails = useQuery(api.mails.getUnapprovedMails)?.sort((a,b)=>{
-    return new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime();
-  })
+  const mails = useQuery(api.mails.getUnapprovedMails)?.sort((a, b) => {
+    return (
+      new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime()
+    );
+  });
 
   // Get job and job update data for the selected mail
   const existingJob = useQuery(
@@ -483,7 +485,7 @@ const JobEditor = () => {
     }
   };
 
-  if(userProfile?.role==="student") return null;
+  if (userProfile?.role === "student") return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -609,9 +611,10 @@ const JobEditor = () => {
                           <SelectContent>
                             {mails.map((mail) => (
                               <SelectItem key={mail._id} value={mail._id}>
-                    {/* {mail.companyName || "Unknown"}:{" "}
+                                {/* {mail.companyName || "Unknown"}:{" "}
                                 {mail.classification} ({mail.reason}) */}
-                                {mail.subject}{new Date(mail._creationTime).toLocaleString()}
+                                {mail.subject}
+                                {new Date(mail._creationTime).toLocaleString()}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -688,7 +691,7 @@ const JobEditor = () => {
               <AlertDialogTrigger asChild>
                 <Button
                   disabled={isSaving || !selectedMailId}
-                  className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="gap-2 text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                   size="lg"
                 >
                   {isSaving ? (
@@ -707,7 +710,10 @@ const JobEditor = () => {
                   )}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent
+                style={{ zIndex: 9999 }}
+                className="fixed bg-white"
+              >
                 <AlertDialogHeader>
                   <AlertDialogTitle>Confirm Action</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -719,8 +725,13 @@ const JobEditor = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => void handleSave()}>
+                  <AlertDialogCancel className="bg-gray-100 hover:bg-gray-200 text-gray-900">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => void handleSave()}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>

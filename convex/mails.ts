@@ -62,6 +62,36 @@ export const approveMail = mutation({
       approvedBy: userId || undefined,
     });
 
+    // Notify admins about the mail approval
+    const adminProfiles = await ctx.db
+      .query("profiles")
+      .filter((q) => q.eq(q.field("role"), "admin"))
+      .collect();
+
+    // Create notifications for all admins
+    for (const adminProfile of adminProfiles) {
+      await ctx.db.insert("notifications", {
+        userId: adminProfile.userId,
+        type: "mail_approval",
+        message: `Mail from ${mail.companyName || "Unknown Company"} has been approved`,
+        read: false,
+        createdAt: Date.now(),
+        relatedId: mailId,
+      });
+    }
+
     return mailId;
+  },
+});
+
+// Get all approved mails
+export const getApprovedMails = query({
+  args: {},
+  handler: async (ctx) => {
+    const mails = await ctx.db
+      .query("mails")
+      .withIndex("by_isApproved", (q) => q.eq("isApproved", true))
+      .collect();
+    return mails;
   },
 });

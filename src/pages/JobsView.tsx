@@ -11,7 +11,9 @@ import {
   ListCheckIcon,
   MapPinIcon,
   FilterIcon,
-  Search
+  Search,
+  ClockIcon,
+  CheckCircleIcon,
 } from "lucide-react";
 import { JobDetailsDialog } from "@/components/JobDetailsDialog";
 import Lottie from "react-lottie";
@@ -20,14 +22,50 @@ import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 
+// Define the shape of a job with status information
+interface JobWithStatus {
+  _id: Id<"jobs">;
+  _creationTime: number;
+  title?: string | null;
+  company?: string | null;
+  description?: string | null;
+  location?: string | null;
+  type?: "full-time" | "internship" | "part-time" | "trainee";
+  skills?: string[];
+  salary?: {
+    stipend?: string | null;
+    postConfirmationCTC?: string | null;
+  } | null;
+  deadline?: string | null;
+  isActive?: boolean;
+  applicationLink?: string[] | null;
+  moreDetails?: {
+    eligibility?: string | null;
+    selectionProcess?: string[];
+    serviceAgreement?: string | null;
+    training?: string | null;
+    joiningDate?: string | null;
+    requiredDocuments?: string | null;
+    companyWebsite?: string | null;
+  } | null;
+  mailId: Id<"mails">;
+  status: {
+    approvalStatus: string;
+    hasApplied: boolean;
+  };
+}
+
 export function JobsView({ isAdmin }: { isAdmin: boolean }) {
-  const jobs = (useQuery(api.jobs.list, { onlyActive: !isAdmin }) ?? []).sort(
-    (a, b) => {
-      const ta = new Date(a._creationTime).getTime();
-      const tb = new Date(b._creationTime).getTime();
-      return tb - ta; // Sort by createdAt, most
-    }
-  );
+  // Updated to use listActiveJobs instead of list with proper typing
+  const jobs = useQuery(api.jobs.listActiveJobs) ?? [];
+
+  // Sort jobs by creation time (most recent first)
+  const sortedJobs = [...jobs].sort((a: JobWithStatus, b: JobWithStatus) => {
+    const ta = new Date(a._creationTime).getTime();
+    const tb = new Date(b._creationTime).getTime();
+    return tb - ta;
+  });
+
   const [selectedJob, setSelectedJob] = useState<Id<"jobs"> | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterValues, setFilterValues] = useState({
@@ -60,7 +98,7 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
   };
 
   // Filter jobs based on searchTerm and filterValues
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = sortedJobs.filter((job: JobWithStatus) => {
     const matchesSearch =
       (job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       (job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ??
@@ -86,7 +124,7 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
 
     return matchesSearch && matchesFilters;
   });
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   return (
     <>
       <div className="min-h-screen flex flex-col">
@@ -104,29 +142,21 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                     Browse through thousands of opportunities that align with
                     your skills, experience, and career goals.
                   </p>
-                  {/* <div className="max-w-xl">
-                    <SearchInput
-                      placeholder="Job title, keywords, or company..."
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                      className="bg-white/90 backdrop-blur-sm border-0 focus:ring-2 focus:ring-yellow-300"
-                      showButton={true}
-                      onSearch={() => console.log("Search clicked")}
-                    />
-                  </div> */}
-                   <div className="flex flex-col sm:flex-row w-full max-w-xl gap-4 bg-white/10 backdrop-blur-md p-2 rounded-xl">
-              <div className="relative flex-grow">
-                <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Job title, keywords, or company"
-                  className="pl-10 h-12 w-full bg-white text-black border-0 focus-visible:ring-2 focus-visible:ring-indigo-500"
-                />
-              </div>
-              <Button className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={()=> navigate("/jobs ")}>
-                Search Jobs
-              </Button>
-            </div>
+                  <div className="flex flex-col sm:flex-row w-full max-w-xl gap-4 bg-white/10 backdrop-blur-md p-2 rounded-xl">
+                    <div className="relative flex-grow">
+                      <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder="Job title, keywords, or company"
+                        className="pl-10 h-12 w-full bg-white text-black border-0 focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                      />
+                    </div>
+                    <Button className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
+                      Search Jobs
+                    </Button>
+                  </div>
                 </div>
                 <div className="w-full md:w-1/2 flex justify-center">
                   <Lottie
@@ -245,11 +275,23 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                     </p>
                   </div>
                 ) : (
-                  filteredJobs.map((job) => (
+                  filteredJobs.map((job: JobWithStatus) => (
                     <Card
                       key={job._id}
-                      onClick={() => setSelectedJob(job._id)}
-                      className="transition-all hover:shadow-xl duration-300 cursor-pointer transform hover:-translate-y-1 bg-white border-0 rounded-xl overflow-hidden"
+                      onClick={
+                        job.status?.approvalStatus === "approved"
+                          ? () => setSelectedJob(job._id)
+                          : undefined
+                      }
+                      className={`transition-all hover:shadow-xl duration-300 ${
+                        job.status?.approvalStatus === "approved"
+                          ? "cursor-pointer"
+                          : "cursor-default"
+                      } transform ${
+                        job.status?.approvalStatus === "approved"
+                          ? "hover:-translate-y-1"
+                          : ""
+                      } bg-white border-0 rounded-xl overflow-hidden`}
                     >
                       <CardContent className="p-6">
                         <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -307,35 +349,49 @@ export function JobsView({ isAdmin }: { isAdmin: boolean }) {
                                   {job.skills.length} Skills
                                 </span>
                               )}
-                            </div>
-                          </div>
-                          <Button
-                            variant="gradient"
-                            className="md:self-center flex items-center gap-2 rounded-lg text-sm font-medium mt-4 md:mt-0 w-full md:w-auto"
-                          >
-                            <ListCheckIcon className="w-4 h-4" />
-                            View Details
-                          </Button>
-                        </div>
-
-                        {/* Skills Section - Centered alignment */}
-                        {/* {job.skills && job.skills.length > 0 && (
-                          <div className="mt-4 pt-4 border-t border-gray-100">
-                            <div className="flex items-center justify-center gap-2 mb-3 text-xs text-gray-500">
-                              <span className="font-medium">Skills</span>
-                            </div>
-                            <div className="flex flex-wrap justify-center gap-2">
-                              {job.skills.map((skill, index) => (
-                                <span
-                                  key={index}
-                                  className="inline-flex items-center justify-center px-4 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-800 hover:bg-gray-100 transition-colors border border-gray-100 mx-1 my-1 min-w-[80px]"
-                                >
-                                  {skill}
+                              {job.status?.approvalStatus === "pending" && (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                  Pending Approval
                                 </span>
-                              ))}
+                              )}
                             </div>
                           </div>
-                        )} */}
+
+                          {/* Dynamic button based on status */}
+                          {job.status?.approvalStatus === "approved" ? (
+                            job.status.hasApplied ? (
+                              <Button
+                                variant="outline"
+                                className="md:self-center flex items-center gap-2 rounded-lg text-sm font-medium mt-4 md:mt-0 w-full md:w-auto border-green-500 text-green-600"
+                                disabled
+                              >
+                                <CheckCircleIcon className="w-4 h-4" />
+                                Applied
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="gradient"
+                                className="md:self-center flex items-center gap-2 rounded-lg text-sm font-medium mt-4 md:mt-0 w-full md:w-auto"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedJob(job._id);
+                                }}
+                              >
+                                <ListCheckIcon className="w-4 h-4" />
+                                View Details
+                              </Button>
+                            )
+                          ) : (
+                            <Button
+                              variant="outline"
+                              className="md:self-center flex items-center gap-2 rounded-lg text-sm font-medium mt-4 md:mt-0 w-full md:w-auto border-amber-500 text-amber-600"
+                              disabled
+                            >
+                              <ClockIcon className="w-4 h-4" />
+                              Pending
+                            </Button>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   ))
