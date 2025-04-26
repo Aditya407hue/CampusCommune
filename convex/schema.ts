@@ -19,8 +19,8 @@ const applicationTables = {
     company: v.optional(v.union(v.string(), v.null())), // Made optional
     description: v.optional(v.union(v.string(), v.null())), // Made optional
     location: v.optional(v.union(v.string(), v.null())), // Made optional
-    isApproved: v.optional(v.boolean()), // Added new field
-    approvedBy: v.optional(v.id("users")), // Made optional
+    // isApproved: v.optional(v.boolean()), // Added new field
+    // approvedBy: v.optional(v.id("users")), // Made optional
     type: v.optional(
       v.union(
         // Made optional
@@ -63,7 +63,11 @@ const applicationTables = {
     mailId: v.id("mails"),
   })
     .index("by_active", ["isActive"])
-    .index("by_deadline", ["deadline"]),
+    .index("by_deadline", ["deadline"])
+    .index("by_createdBy", ["createdBy"])
+    .index("by_mailId", ["mailId"])
+    .index("by_title", ["title"])
+    .index("by_company", ["company"]),
 
   applications: defineTable({
     jobId: v.id("jobs"),
@@ -96,15 +100,18 @@ const applicationTables = {
     mailContent: v.string(),
     noOfAttachments: v.number(),
     attachmentLinks: v.array(v.string()),
+    companyName: v.optional(v.union(v.string(), v.null())),
     classification: v.string(),
     reason: v.string(),
-  }),
+    isApproved: v.boolean(),
+    approvedBy: v.optional(v.id("users")),
+  }).index("by_isApproved", ["isApproved"]),
 
   jobUpdates: defineTable({
     summary: v.optional(v.union(v.string(), v.null())),
     mailId: v.id("mails"),
     jobId: v.id("jobs"),
-  }),
+  }).index("by_mailId", ["mailId"]),
 };
 
 export default defineSchema({
