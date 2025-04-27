@@ -99,10 +99,10 @@ function AtsAnalysisView() {
         </div>
       </div>
 
-      <main className="container mx-auto px-8">
+      <main className="mx-auto px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Section: Analysis Form */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-6 space-y-6">
             {/* Resume Upload Card */}
             <Card className="bg-white border-0 shadow-sm overflow-hidden">
               <CardHeader className="pb-2 border-b bg-gray-50/80">
@@ -255,7 +255,7 @@ function AtsAnalysisView() {
           </div>
 
           {/* Right Section: Results */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-6">
             <Card className="bg-white border-0 shadow-sm overflow-hidden h-full">
               <CardHeader className="pb-2 border-b bg-gray-50/80">
                 <CardTitle className="text-lg font-semibold text-gray-800">

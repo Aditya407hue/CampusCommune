@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom"; // Import Link for navigation
 import { FileText } from "lucide-react"; // Import an icon for the button
 import { Doc } from "convex/_generated/dataModel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Profile from "../components/Profile/Profile";
 import { UserIcon } from "lucide-react";
 
@@ -15,6 +15,24 @@ export function ProfileView({
   };
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [showResumeText, setShowResumeText] = useState(false);
+
+    useEffect(() => {
+    // First show only the icon
+    setShowResumeText(false);
+    
+    // After 3 seconds, show the text next to the icon
+    const textTimer = setTimeout(() => {
+      setShowResumeText(true);
+    }, 2000);
+    
+    // After 6 seconds, show the popup (giving time for text animation to complete)
+    
+    return () => {
+      clearTimeout(textTimer)
+    };
+  }, []);
+  
 
   if (!profile) {
     return (
@@ -26,6 +44,8 @@ export function ProfileView({
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen px-8 bg-gray-50">
@@ -56,11 +76,16 @@ export function ProfileView({
           setIsEditing={setIsEditing}
         />
 
-        <Link
+<Link
           to="/ats-analysis"
-          className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-colors flex items-center justify-center"
-          title="Analyze Resume with ATS"
+          className={`fixed bottom-8 right-8 bg-indigo-600 text-white ${showResumeText ? 'px-4 py-2' : 'p-4'} rounded-full shadow-lg hover:bg-indigo-700 hover:scale-110 hover:shadow-xl transition-all duration-300 ease-in-out transform flex items-center justify-center gap-2`}
+          title="Analyze Resume with ATS" 
         >
+          <span 
+            className={`font-semibold overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out ${showResumeText ? 'max-w-32 opacity-100 mr-2' : 'max-w-0 opacity-0 mr-0'}`}
+          >
+            Resume Analysis
+          </span>
           <FileText className="h-6 w-6" />
         </Link>
       </div>
