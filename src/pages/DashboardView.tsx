@@ -12,9 +12,8 @@ import { useQuery } from "convex/react";
 import { useState, useEffect } from "react";
 import { JobDetailsDialog } from "@/components/JobDetailsDialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, X } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export function DashboardView({ isAdmin }: { isAdmin: boolean }) {
   const jobs = useQuery(api.jobs.list, { onlyActive: !isAdmin }) ?? [];
