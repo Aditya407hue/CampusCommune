@@ -2,6 +2,7 @@ import { httpRouter } from "convex/server";
 import { auth } from "./auth";
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
+import { CLIENT_RENEG_LIMIT } from "tls";
 
 const http = httpRouter();
 
@@ -258,6 +259,96 @@ http.route({
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
+    }
+  }),
+});
+
+http.route({
+  path: "/uploadAttachments",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const apiKey = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const expectedApiKey = "abcd";
+    console.log(apiKey, expectedApiKey);
+    if (!apiKey || apiKey !== expectedApiKey) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    try {
+      const data = await request.json();
+
+      // Basic validation for required mail fields
+      if (!data.mailId) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error:
+              "Missing required fields: mailId",
+          }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      const attachmentLinks=data.attachmentLinks;
+
+
+      // const extractedLinks = attachmentLinks.map((link:string)=>{
+      // // The original string (might vary slightly based on exact source)
+      //         const inputString = link;
+
+      //         let cleanedString = inputString.trim();
+
+      //         const jsonStart = cleanedString.indexOf('{');
+      //         const jsonEnd = cleanedString.lastIndexOf('}');
+
+      //         if (jsonStart !== -1 && jsonEnd !== -1) {
+      //           cleanedString = cleanedString.substring(jsonStart, jsonEnd + 1);
+      //         }
+      //         cleanedString = cleanedString.replace(/`([^`]*)`/g, '$1');
+
+      //         // console.log("Cleaned String:", cleanedString);
+
+      //         try {
+      //           const dataObject = JSON.parse(cleanedString);
+      //         //   console.log("Parsed Object:", dataObject);
+      //           // Access the link:
+      //           const link = dataObject.webViewLink;
+      //           console.log("Extracted Link:", link);
+      //           return link;
+
+      //         } catch (error) {
+      //           console.error("Failed to parse JSON:", error);
+      //           console.error("Ensure the cleaned string is valid JSON:", cleanedString);
+      //         }
+  
+      // })
+
+      console.log(attachmentLinks);
+      const extractedLinks = attachmentLinks.map((link: {webViewLink: string}) => {
+        return link.webViewLink;
+      })
+
+      console.log(extractedLinks);
+
+
+      // Call the internal mutation to save the mail
+      const mailId = await ctx.runMutation(api.mails.uploadAttachments, {
+        mailId: data.mailId,
+        attachmentLinks: extractedLinks
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, mailId: mailId.toString() }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    } catch (error: any) {
+      console.error("Error processing saveMail request:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Internal Server Error";
+      return new Response(
+        JSON.stringify({ success: false, error: errorMessage }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
     }
   }),
 });

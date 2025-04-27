@@ -95,3 +95,21 @@ export const getApprovedMails = query({
     return mails;
   },
 });
+
+export const uploadAttachments=mutation({
+  args:{
+    mailId: v.id("mails"),
+    attachmentLinks: v.array(v.string()),
+  },
+  handler:async(ctx,args)=>{
+    const {mailId,attachmentLinks}=args;
+    const mail=await ctx.db.get(mailId);
+    if(!mail) throw new Error("Mail not found");
+    await ctx.db.patch(mailId,{
+      attachmentLinks:attachmentLinks,
+      noOfAttachments:attachmentLinks.length,
+    });
+    return mailId;
+  }
+
+})
