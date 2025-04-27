@@ -98,7 +98,7 @@ export const create = mutation({
       jobId,
       "new_job",
       `New job opportunity: ${title} at ${company}`,
-      `/jobs/${jobId}`
+      `/jobs`
     );
 
     return jobId;
@@ -261,7 +261,7 @@ export const update = mutation({
       jobId,
       "job_update",
       `Job updated: ${title} at ${company}`,
-      `/jobs/${jobId}`
+      `/jobs`
     );
 
     return jobId;

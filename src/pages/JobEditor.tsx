@@ -374,9 +374,19 @@ const JobEditor = () => {
       ) {
         if (jobType === JOB_TYPES.NEW_JOB && existingJob) {
           // Update existing job
+          console.log(jobFormData)
           await updateJobData({
             jobId: existingJob._id,
-            ...jobFormData,
+            title : jobFormData.title,
+            company : jobFormData.company,
+            description : jobFormData.description,
+            location : jobFormData.location,
+            type : jobFormData.type,
+            skills : jobFormData.skills,
+            salary : jobFormData.salary,
+            deadline : jobFormData.deadline,
+            applicationLink : jobFormData.applicationLink,
+            moreDetails : jobFormData.moreDetails
           });
           toast({
             title: "Success",
