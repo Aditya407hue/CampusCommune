@@ -12,9 +12,12 @@ import {
   BanknoteIcon,
   FileUpIcon,
   XIcon,
+  PaperclipIcon,
+  ExternalLinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { error } from "console";
 
 interface JobDetailsDialogProps {
   jobId: Id<"jobs">;
@@ -23,6 +26,7 @@ interface JobDetailsDialogProps {
 
 export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
   const job = useQuery(api.jobs.getById, { jobId }) ?? {
+    mailId: null,
     companyName: "Loading...",
     role: "Loading...",
     jobDetails: "Loading...",
@@ -48,6 +52,14 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
       companyWebsite: "Loading...",
     },
   };
+
+  // Fetch mail data to get attachment links
+  const mailData = useQuery(
+    api.mails.getMailById,
+    job?.mailId ? { mailId: job.mailId } : "skip"
+  );
+
+  const attachmentLinks = mailData?.attachmentLinks || [];
   const apply = useMutation(api.applications.apply);
   const [resume, setResume] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -170,9 +182,33 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
                   </div>
                 )}
 
+              {/* Attachments */}
+              {attachmentLinks.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                    <PaperclipIcon className="h-4 w-4 mr-2 text-indigo-600" />
+                    Attachments
+                  </h4>
+                  <div className="space-y-2">
+                    {attachmentLinks.map((link, index) => (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-indigo-600 hover:text-indigo-800 hover:underline p-2 bg-indigo-50 rounded-md"
+                      >
+                        <PaperclipIcon className="h-4 w-4 mr-2" />
+                        Attachment {index + 1}
+                        <ExternalLinkIcon className="h-3 w-3 ml-1" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Application link */}
               {job.applicationLink && (
-                
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-2">
                     Application Links
@@ -266,8 +302,8 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
             </div>
           ) : (
             <>
-            <div className="flex justify-end gap-4 pt-4">
-                 <Button
+              <div className="flex justify-end gap-4 pt-4">
+                <Button
                   type="button"
                   onClick={onClose}
                   variant="outline"
@@ -278,7 +314,9 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
                 <Button
                   // disabled={isUploading || !resume}
                   className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={(e)=> handleApply(e)}
+                  onClick={(e) => {
+                    handleApply(e);
+                  }}
                 >
                   {isUploading ? (
                     <div className="flex items-center">
@@ -309,83 +347,7 @@ export function JobDetailsDialog({ jobId, onClose }: JobDetailsDialogProps) {
                   )}
                 </Button>
               </div>
-                     {/* // <form onSubmit={handleApply} className="space-y-4">
-            //   <h3 className="text-lg font-semibold">Submit Your Application</h3>
-
-            //   <div className="space-y-2">
-            //     <label className="block text-sm font-medium text-gray-700">
-            //       Upload Resume (PDF, DOC, DOCX)
-            //     </label>
-            //     <div className="flex items-center">
-            //       <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none cursor-pointer">
-            //         <FileUpIcon className="h-4 w-4" />
-            //         {resume ? resume.name : "Select File"}
-            //         <input
-            //           type="file"
-            //           accept=".pdf,.doc,.docx"
-            //           onChange={handleFileChange}
-            //           className="sr-only"
-            //         />
-            //       </label>
-            //       {resume && (
-            //         <button
-            //           type="button"
-            //           onClick={() => setResume(null)}
-            //           className="ml-2 text-sm text-gray-500 hover:text-gray-700"
-            //         >
-            //           Remove
-            //         </button>
-            //       )}
-            //     </div>
-            //     <p className="text-xs text-gray-500">Max file size: 5MB</p>
-            //   </div>
-
-            //   <div className="flex justify-end gap-4 pt-4">
-            //     <Button
-            //       type="button"
-            //       onClick={onClose}
-            //       variant="outline"
-            //       className="px-4 py-2"
-            //     >
-            //       Cancel
-            //     </Button>
-            //     <Button
-            //       type="submit"
-            //       disabled={isUploading || !resume}
-            //       className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            //     >
-            //       {isUploading ? (
-            //         <div className="flex items-center">
-            //           <svg
-            //             className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-            //             xmlns="http://www.w3.org/2000/svg"
-            //             fill="none"
-            //             viewBox="0 0 24 24"
-            //           >
-            //             <circle
-            //               className="opacity-25"
-            //               cx="12"
-            //               cy="12"
-            //               r="10"
-            //               stroke="currentColor"
-            //               strokeWidth="4"
-            //             ></circle>
-            //             <path
-            //               className="opacity-75"
-            //               fill="currentColor"
-            //               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            //             ></path>
-            //           </svg>
-            //           Submitting...
-            //         </div>
-            //       ) : (
-            //         "Apply Now"
-            //       )}
-            //     </Button>
-            //   </div>
-            // </form> */}
             </>
-   
           )}
         </Dialog.Panel>
       </div>

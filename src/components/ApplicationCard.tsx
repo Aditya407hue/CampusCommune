@@ -14,13 +14,18 @@ interface ApplicationCardProps {
   isAdmin: boolean;
 }
 
-export function ApplicationCard({ application, isAdmin }: ApplicationCardProps) {
+export function ApplicationCard({
+  application,
+  isAdmin,
+}: ApplicationCardProps) {
   const job = useQuery(api.jobs.getById, { jobId: application.jobId });
   const updateStatus = useMutation(api.applications.updateStatus);
 
   if (!job) return null;
 
-  const handleStatusUpdate = async (status: "pending" | "shortlisted" | "rejected" | "accepted") => {
+  const handleStatusUpdate = async (
+    status: "pending" | "shortlisted" | "rejected" | "accepted"
+  ) => {
     try {
       await updateStatus({ applicationId: application._id, status });
       toast.success("Application status updated");
@@ -36,16 +41,18 @@ export function ApplicationCard({ application, isAdmin }: ApplicationCardProps) 
           <h3 className="text-lg font-semibold mb-2">{job.title}</h3>
           <p className="text-gray-600 mb-4">{job.company}</p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>Applied: {new Date(application.appliedAt).toLocaleDateString()}</span>
+            <span>
+              Applied: {new Date(application.appliedAt).toLocaleDateString()}
+            </span>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
                 application.status === "accepted"
                   ? "bg-green-100 text-green-800"
                   : application.status === "rejected"
-                  ? "bg-red-100 text-red-800"
-                  : application.status === "shortlisted"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-800"
+                    ? "bg-red-100 text-red-800"
+                    : application.status === "shortlisted"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
               }`}
             >
               {application.status}

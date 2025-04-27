@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { Toggle } from "@/components/ui/toggle";
-import { Edit, View, FileText, Bell, Plus, Send } from "lucide-react";
+import {
+  Edit,
+  View,
+  FileText,
+  Bell,
+  Plus,
+  Send,
+  PaperclipIcon,
+} from "lucide-react";
 import { TextViewer } from "@/components/JobEditor/TextViewer";
 import { JobPostingForm } from "@/components/JobEditor/JobPostingForm";
 import { JobUpdateForm } from "@/components/JobEditor/JobUpdateForm";
@@ -183,6 +191,14 @@ const JobEditor = () => {
     );
   });
 
+  // Get the selected mail's attachment links
+  const selectedMail = useQuery(
+    api.mails.getMailById,
+    selectedMailId ? { mailId: selectedMailId } : "skip"
+  );
+
+  const attachmentLinks = selectedMail?.attachmentLinks || [];
+
   // Get job and job update data for the selected mail
   const existingJob = useQuery(
     api.jobs.getJobByMailId,
@@ -203,6 +219,7 @@ const JobEditor = () => {
   const deleteJob = useMutation(api.jobs.deleteJob);
   const deleteJobUpdate = useMutation(api.jobUpdates.deleteJobUpdate);
   const approveMail = useMutation(api.mails.approveMail);
+
   // When a mail is selected, determine what connections it has and update state
   useEffect(() => {
     if (!selectedMailId) return;
@@ -374,19 +391,19 @@ const JobEditor = () => {
       ) {
         if (jobType === JOB_TYPES.NEW_JOB && existingJob) {
           // Update existing job
-          console.log(jobFormData)
+          console.log(jobFormData);
           await updateJobData({
             jobId: existingJob._id,
-            title : jobFormData.title,
-            company : jobFormData.company,
-            description : jobFormData.description,
-            location : jobFormData.location,
-            type : jobFormData.type,
-            skills : jobFormData.skills,
-            salary : jobFormData.salary,
-            deadline : jobFormData.deadline,
-            applicationLink : jobFormData.applicationLink,
-            moreDetails : jobFormData.moreDetails
+            title: jobFormData.title,
+            company: jobFormData.company,
+            description: jobFormData.description,
+            location: jobFormData.location,
+            type: jobFormData.type,
+            skills: jobFormData.skills,
+            salary: jobFormData.salary,
+            deadline: jobFormData.deadline,
+            applicationLink: jobFormData.applicationLink,
+            moreDetails: jobFormData.moreDetails,
           });
           toast({
             title: "Success",
@@ -474,7 +491,10 @@ const JobEditor = () => {
       }
 
       // If PR user is processing this mail, mark it as approved
-      if ((userProfile?.role === "pr" || userProfile?.role==="admin")  && selectedMailId) {
+      if (
+        (userProfile?.role === "pr" || userProfile?.role === "admin") &&
+        selectedMailId
+      ) {
         await approveMail({
           mailId: selectedMailId,
           userId: userId as Id<"users">,
@@ -496,7 +516,7 @@ const JobEditor = () => {
   };
 
   if (userProfile?.role === "student") return null;
-  
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="container mx-auto px-6 py-8 -mt-6">
@@ -621,8 +641,6 @@ const JobEditor = () => {
                           <SelectContent>
                             {mails.map((mail) => (
                               <SelectItem key={mail._id} value={mail._id}>
-                                {/* {mail.companyName || "Unknown"}:{" "}
-                                {mail.classification} ({mail.reason}) */}
                                 {mail.subject}
                                 {new Date(mail._creationTime).toLocaleString()}
                               </SelectItem>
@@ -634,6 +652,30 @@ const JobEditor = () => {
                       )}
                     </CardContent>
                   </Card>
+
+                  {/* Attachment Links Section */}
+                  {attachmentLinks.length > 0 && (
+                    <div className="mb-4 p-4 border rounded-md bg-indigo-50 border-indigo-100">
+                      <h3 className="text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                        <PaperclipIcon className="h-4 w-4 mr-1" />
+                        Attachments ({attachmentLinks.length})
+                      </h3>
+                      <div className="space-y-2">
+                        {attachmentLinks.map((link, index) => (
+                          <a
+                            key={index}
+                            href={link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-indigo-600 hover:text-indigo-800 hover:underline text-sm p-1"
+                          >
+                            <PaperclipIcon className="h-3 w-3 mr-1" />
+                            Attachment {index + 1}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <ScrollArea className="h-[calc(100vh-400px)] rounded-lg border bg-white p-4">
                     <TextViewer

@@ -39,7 +39,7 @@ interface ProfileProps {
 
 const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
   const [activeItem, setActiveItem] = useState("Profile");
-  const updateProfile=useMutation(api.profile.patch);
+  const updateProfile = useMutation(api.profile.patch);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -70,8 +70,8 @@ const Profile = ({ profile, isEditing = true, setIsEditing }: ProfileProps) => {
       department: formData.department,
       graduationYear: +formData.graduationYear,
       role: profile.role,
-      skills: formData.skills.split(",")
-    })
+      skills: formData.skills.split(","),
+    });
   };
 
   // Calculate profile completion percentage

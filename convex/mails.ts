@@ -96,20 +96,32 @@ export const getApprovedMails = query({
   },
 });
 
-export const uploadAttachments=mutation({
-  args:{
+export const uploadAttachments = mutation({
+  args: {
     mailId: v.id("mails"),
     attachmentLinks: v.array(v.string()),
   },
-  handler:async(ctx,args)=>{
-    const {mailId,attachmentLinks}=args;
-    const mail=await ctx.db.get(mailId);
-    if(!mail) throw new Error("Mail not found");
-    await ctx.db.patch(mailId,{
-      attachmentLinks:attachmentLinks,
-      noOfAttachments:attachmentLinks.length,
+  handler: async (ctx, args) => {
+    const { mailId, attachmentLinks } = args;
+    const mail = await ctx.db.get(mailId);
+    if (!mail) throw new Error("Mail not found");
+    await ctx.db.patch(mailId, {
+      attachmentLinks: attachmentLinks,
+      noOfAttachments: attachmentLinks.length,
     });
     return mailId;
-  }
+  },
+});
 
-})
+// Get mail by ID (needed for attachment links)
+export const getMailById = query({
+  args: {
+    mailId: v.id("mails"),
+  },
+  handler: async (ctx, args) => {
+    const { mailId } = args;
+    const mail = await ctx.db.get(mailId);
+    if (!mail) return null;
+    return mail;
+  },
+});
