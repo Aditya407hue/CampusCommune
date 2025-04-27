@@ -464,7 +464,7 @@ const JobEditor = () => {
       }
 
       // If PR user is processing this mail, mark it as approved
-      if (userProfile?.role === "pr" && selectedMailId) {
+      if ((userProfile?.role === "pr" || userProfile?.role==="admin")  && selectedMailId) {
         await approveMail({
           mailId: selectedMailId,
           userId: userId as Id<"users">,
@@ -625,7 +625,7 @@ const JobEditor = () => {
                     </CardContent>
                   </Card>
 
-                  <ScrollArea className="h-[calc(100vh-600px)] rounded-lg border bg-white p-4">
+                  <ScrollArea className="h-[calc(100vh-400px)] rounded-lg border bg-white p-4">
                     <TextViewer
                       text={
                         (mails &&
@@ -656,7 +656,7 @@ const JobEditor = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ScrollArea className="h-[calc(100vh-600px)]">
+                  <ScrollArea className="h-[calc(100vh-200px)]">
                     {jobType === JOB_TYPES.NEW_JOB ? (
                       <JobPostingForm
                         data={jobFormData}
@@ -729,7 +729,7 @@ const JobEditor = () => {
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={() => void handleSave()}
+                    onClick={() => handleSave()}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
                     Continue

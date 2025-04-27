@@ -93,13 +93,13 @@ function AtsAnalysisView() {
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header Bar - bright blue to match screenshot */}
-      <div className="bg-blue-600 py-4 w-full mb-6">
+      <div className="py-4 mx-8 mb-6 bg-gradient-to-r from-indigo-600 to-purple-600">
         <div className="container mx-auto px-6">
           <h1 className="text-2xl font-bold text-white">ATS Resume Analysis</h1>
         </div>
       </div>
 
-      <main className="container mx-auto px-6 max-w-6xl">
+      <main className="container mx-auto px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Section: Analysis Form */}
           <div className="lg:col-span-7 space-y-6">

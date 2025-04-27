@@ -28,9 +28,9 @@ export function ProfileView({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen px-8 bg-gray-50">
       {/* Simple header */}
-      <div className="bg-indigo-600 py-4 w-full">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-4 w-full">
         <div className="w-full px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

@@ -70,6 +70,23 @@ export function JobPostingForm({
     handleMoreDetailsChange("selectionProcess", selectionProcess);
   };
 
+  const addApplicationLink = () => {
+    const applicationLink = [...(data.applicationLink || []), ""];
+    onChange({ ...data, applicationLink });
+  };
+
+  const updateApplicationLink = (index: number, value: string) => {
+    const applicationLink = [...(data.applicationLink || [])];
+    applicationLink[index] = value;
+    onChange({ ...data, applicationLink });
+  };
+
+  const removeApplicationLink = (index: number) => {
+    const applicationLink = [...(data.applicationLink || [])];
+    applicationLink.splice(index, 1);
+    onChange({ ...data, applicationLink });
+  };
+
   return (
     <div className="space-y-6">
       {/* Basic Information Section */}
@@ -361,6 +378,48 @@ export function JobPostingForm({
                 disabled={!isEditMode}
                 placeholder="e.g., https://company.com"
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Application Links</Label>
+              <div className="space-y-2">
+                {(data.applicationLink || []).map(
+                  (link: string, index: number) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={link}
+                        onChange={(e) =>
+                          updateApplicationLink(index, e.target.value)
+                        }
+                        disabled={!isEditMode}
+                        placeholder="e.g., https://apply.company.com"
+                      />
+                      {isEditMode && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeApplicationLink(index)}
+                          className="shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                )}
+                {isEditMode && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addApplicationLink}
+                    className="mt-2"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Application Link
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>

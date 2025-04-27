@@ -19,6 +19,7 @@ import { NotificationDropdown } from "@/components/ui/notification-dropdown";
 const Navbar = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const isAdmin = useQuery(api.users.isAdmin);
   const userIsPR = useQuery(api.users.isPR);
 
@@ -104,11 +105,11 @@ const Navbar = () => {
                 variant="ghost"
                 className="bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-600"
               >
-                <Link to="/jobs/new">Post a Job</Link>
+                <Link to="/job-editor">Post a Job</Link>
               </Button>
             )}
 
-            <DropdownMenu>
+            <DropdownMenu open={isAccountMenuOpen} onOpenChange={setIsAccountMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="default"
@@ -119,17 +120,17 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white w-48">
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem className="cursor-pointer" onClick={() => setIsAccountMenuOpen(false)}>
                   <Link to="/profile" className="w-full">
                     Profile
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsAccountMenuOpen(false)}>
                   <Link to="/applications" className="w-full">
                     Applications
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsAccountMenuOpen(false)}>
                   <SignOutButton />
                 </DropdownMenuItem>
               </DropdownMenuContent>

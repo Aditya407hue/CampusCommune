@@ -99,7 +99,7 @@ export function ApplicationsView({ isAdmin }: { isAdmin: boolean }) {
         </div>
       </div> */}
 
-      <div className="mt-10 container mx-auto px-8 mb-8">
+      <div className=" mx-auto px-8 mb-8">
         <div className="grid grid-cols-12 gap-6">
           {/* Main Applications Component - Takes 12 columns */}
           <div className="col-span-12">
@@ -216,7 +216,7 @@ export function ApplicationsView({ isAdmin }: { isAdmin: boolean }) {
 
                 <Button
                   variant="default"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="bg-gradient-to-r text-white from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                 >
                   Contact Employer
                 </Button>
