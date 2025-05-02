@@ -2,7 +2,6 @@ import { CTA } from "@/components/Dashboard/CTA";
 import FeaturedJobs from "@/components/Dashboard/FeaturedJobs";
 import Footer from "@/components/Dashboard/Footer";
 import HeroSection from "@/components/Dashboard/HeroSection";
-import HowItWorks from "@/components/Dashboard/HowItWorks";
 import JobCategories from "@/components/Dashboard/JobCategories";
 import StatsSection from "@/components/Dashboard/StatsSection";
 import Testimonials from "@/components/Dashboard/Testimonials";
