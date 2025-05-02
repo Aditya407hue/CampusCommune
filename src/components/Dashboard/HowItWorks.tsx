@@ -1,7 +1,7 @@
-import createAcc from "./../../lottiefiles/create-acc.json";
-import searchJobs from "./../../lottiefiles/search-jobs.json";
-import checkAnimated from "./../../lottiefiles/check-animated.json";
-import hired from "./../../lottiefiles/hired.json";
+import createAcc from "src/lottiefiles/create-acc.json";
+import searchJobs from "src/lottiefiles/search-jobs.json";
+import checkAnimated from "src/lottiefiles/check-animated.json";
+import hired from "src/lottiefiles/hired.json";
 import Lottie from "react-lottie";
 import { useEffect, useState, useRef } from "react";
 import { ChevronRightIcon } from "lucide-react";
