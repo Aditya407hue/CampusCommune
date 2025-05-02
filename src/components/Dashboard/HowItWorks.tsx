@@ -1,10 +1,13 @@
-import createAcc from "src/lottiefiles/create-acc.json";
-import searchJobs from "src/lottiefiles/search-jobs.json";
-import checkAnimated from "src/lottiefiles/check-animated.json";
-import hired from "src/lottiefiles/hired.json";
+import createAcc from "./../../lottiefiles/create-acc.json";
+import searchJobs from "./../../lottiefiles/search-jobs.json";
+import checkAnimated from "./../../lottiefiles/check-animated.json";
+import hired from "./../../lottiefiles/hired.json";
 import Lottie from "react-lottie";
 import { useEffect, useState, useRef } from "react";
 import { ChevronRightIcon } from "lucide-react";
+
+
+
 
 const HowItWorks = () => {
   const steps = [
@@ -36,7 +39,7 @@ const HowItWorks = () => {
       color: "green",
     },
   ];
-
+  console.log(steps);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -137,6 +140,7 @@ const HowItWorks = () => {
                     />
                   </div>
 
+        
                   <h3
                     className={`text-xl font-bold mb-3 text-${step.color}-700`}
                   >
