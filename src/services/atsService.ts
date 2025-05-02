@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {GoogleGenerativeAI}  from "@google/generative-ai";
 // Import pdfjs and worker directly
 import * as pdfjs from "pdfjs-dist";
 
@@ -11,9 +11,14 @@ if (typeof window !== "undefined" && "Worker" in window) {
 }
 
 // Initialize Google Generative AI client with your API key
-//const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-const genAI = new GoogleGenerativeAI("AIzaSyACxqOVDRvhEEFTW-hkFJpKjOtrF1QBePA");
-// console.log(import.meta.env.GEMINI_API_KEY);
+const GOOGLE_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!GOOGLE_API_KEY) {
+  throw new Error("Missing VITE_GEMINI_API_KEY environment variable. Make sure it's set in your .env.local file.");
+}
+
+const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+// console.log(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // Prompts for different types of analysis
