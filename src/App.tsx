@@ -11,7 +11,7 @@ import { ApplicationsView } from "./pages/ApplicationsView";
 import { ProfileView } from "./pages/ProfileView";
 import JobEditor from "./pages/JobEditor";
 import AtsAnalysisView from "./pages/AtsAnalysisView"; // Import the new ATS analysis view
-import SignInAnimation from "@/lottiefiles/SignInAnimation.json";
+import SignInAnimation from "@/lotties/SignInAnimation.json";
 import Lottie from "react-lottie";
 import Navbar from "./components/Dashboard/Navbar";
 

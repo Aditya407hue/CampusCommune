@@ -1,8 +1,8 @@
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Search, ArrowDownCircle, ChevronDown } from "lucide-react";
-import animationData from "@/lottiefiles/search-lottie.json";
-import flybusinessman from "@/lottiefiles/flying-businessman.json";
+import animationData from "@/lotties/search-lottie.json";
+import flybusinessman from "@/lotties/flying-businessman.json";
 import Lottie from "react-lottie";
 import { useNavigate } from "react-router-dom";
 

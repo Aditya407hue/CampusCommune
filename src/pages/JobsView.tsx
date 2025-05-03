@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { JobDetailsDialog } from "@/components/JobDetailsDialog";
 import Lottie from "react-lottie";
-import searchLottie from "@/lottiefiles/search-jobs.json";
+import searchLottie from "@/lotties/search-jobs.json";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";

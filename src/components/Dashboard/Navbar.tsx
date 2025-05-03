@@ -1,6 +1,6 @@
 import { Button } from "../../components/ui/button";
 import Lottie from "react-lottie";
-import logoAnimation from "@/lottiefiles/create-acc.json";
+import logoAnimation from "@/lotties/create-acc.json";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Menu, X } from "lucide-react";

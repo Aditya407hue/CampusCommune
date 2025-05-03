@@ -21,7 +21,7 @@ import {
 import { useState } from "react";
 import { Doc, Id } from "convex/_generated/dataModel";
 import Lottie from "react-lottie";
-import applicationLottie from "@/lottiefiles/check-animated.json";
+import applicationLottie from "@/lotties/check-animated.json";
 
 // Define the combined type for application with job details
 type ApplicationWithJob = Doc<"applications"> & { job: Doc<"jobs"> | null };
