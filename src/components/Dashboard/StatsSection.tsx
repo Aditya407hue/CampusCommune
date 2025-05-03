@@ -1,7 +1,7 @@
-import jobsLottie from "./../../lotties/jobs-lottie.json";
-import companiesLottie from "./../../lotties/companies-lottie.json";
-import peopleLottie from "./../../lotties/people-lottie.json";
-import checkLottie from "./../../lotties/check-lottie.json";
+import jobsLottie from "@/lotties/jobs-lottie.json";
+import companiesLottie from "@/lotties/companies-lottie.json";
+import peopleLottie from "@/lotties/people-lottie.json";
+import checkLottie from "@/lotties/check-lottie.json";
 import Lottie from "react-lottie";
 import { useEffect, useRef, useState } from "react";
 
