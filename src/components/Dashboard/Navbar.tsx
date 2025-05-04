@@ -146,7 +146,7 @@ const Navbar = () => {
             >
             
               {/* Telegram Logo */}
-              <img src="../../../assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
+              <img src="src\assets\telegram.svg" alt="Telegram" className="h-8 w-8" />
             </a>
           </div>
 
