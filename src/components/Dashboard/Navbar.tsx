@@ -209,7 +209,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-indigo-600 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100"
                 aria-label="Join our Telegram channel"
               >
-                <img src="/src/assets/telegram.svg" alt="Telegram" className="h-5 w-5" />
+                <img src="https://imgs.search.brave.com/mZubhDzUuUTVFDwofyxpHZBhUe2dVW4xJSmUoDjlFmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy84/LzgyL1RlbGVncmFt/X2xvZ28uc3Zn" alt="Telegram" className="h-5 w-5" />
                 <span>Join Telegram Channel</span>
               </a>
               
