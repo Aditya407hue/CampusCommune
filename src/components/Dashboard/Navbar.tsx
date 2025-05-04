@@ -144,8 +144,9 @@ const Navbar = () => {
               className="text-gray-600 hover:text-indigo-600 transition-colors"
               aria-label="Join our Telegram channel"
             >
+            
               {/* Telegram Logo */}
-              <img src="/src/assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
+              <img src="../../../assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
             </a>
           </div>
 
