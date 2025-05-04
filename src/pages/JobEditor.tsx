@@ -635,20 +635,29 @@ const JobEditor = () => {
                             setSelectedMailId(value as Id<"mails">);
                           }}
                         >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select email" />
+                          <SelectTrigger className="w-full bg-white border-indigo-100 hover:border-indigo-300 focus:ring-indigo-500 transition-all">
+                            <SelectValue placeholder="Select email to process" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white border border-indigo-100 shadow-md">
                             {mails.map((mail) => (
-                              <SelectItem key={mail._id} value={mail._id}>
-                                {mail.subject}
-                                {new Date(mail._creationTime).toLocaleString()}
+                              <SelectItem 
+                                key={mail._id} 
+                                value={mail._id}
+                                className="py-3 px-2 border-b border-gray-50 hover:bg-indigo-50 cursor-pointer focus:bg-indigo-50 focus:text-indigo-700"
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium text-gray-800">{mail.companyName || "Unknown Company"}</span>
+                                  <div className="flex justify-between items-center mt-1">
+                                    <span className="text-xs text-gray-500">{mail.classification}</span>
+                                    <span className="text-xs text-indigo-600">{new Date(mail._creationTime).toLocaleDateString()}</span>
+                                  </div>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       ) : (
-                        <p className="text-gray-500">No emails available</p>
+                        <p className="text-gray-500 flex items-center justify-center py-3">No emails available</p>
                       )}
                     </CardContent>
                   </Card>

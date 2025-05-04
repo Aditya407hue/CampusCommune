@@ -136,17 +136,16 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Telegram Link */}
+            {/* Telegram Link - Improved styling */}
             <a
-              href="https://t.me/CampusCommune" // Replace with your actual Telegram link
+              href="https://t.me/CampusCommune"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-indigo-600 transition-all duration-200"
               aria-label="Join our Telegram channel"
             >
-            
-              {/* Telegram Logo */}
-              <img src="src\assets\telegram.svg" alt="Telegram" className="h-8 w-8" />
+              <img src="/src/assets/telegram.svg" alt="Telegram" className="h-5 w-5" />
+              <span className="text-sm font-medium">Join Channel</span>
             </a>
           </div>
 
@@ -201,6 +200,19 @@ const Navbar = () => {
                   Post a Job
                 </Link>
               )}
+              {/* Telegram Link in mobile menu */}
+              <a
+                href="https://t.me/CampusCommune"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-indigo-600 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100"
+                aria-label="Join our Telegram channel"
+              >
+                <img src="/src/assets/telegram.svg" alt="Telegram" className="h-5 w-5" />
+                <span>Join Telegram Channel</span>
+              </a>
+              
               <div className="pt-2 mt-2 border-t border-gray-100">
                 <SignOutButton />
               </div>
