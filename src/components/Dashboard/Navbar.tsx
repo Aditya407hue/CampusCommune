@@ -3,7 +3,7 @@ import Lottie from "react-lottie";
 import logoAnimation from "@/lotties/create-acc.json";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X} from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
@@ -135,6 +135,18 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Telegram Link */}
+            <a
+              href="https://t.me/CampusCommune" // Replace with your actual Telegram link
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              aria-label="Join our Telegram channel"
+            >
+              {/* Telegram Logo */}
+              <img src="../../../dist/assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
