@@ -145,7 +145,7 @@ const Navbar = () => {
               aria-label="Join our Telegram channel"
             >
               {/* Telegram Logo */}
-              <img src="../../../dist/assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
+              <img src="/src/assets/telegram.svg" alt="Telegram" className="h-8 w-8" />
             </a>
           </div>
 
